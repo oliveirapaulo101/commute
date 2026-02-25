@@ -545,9 +545,19 @@
 
   <div id="summarySection"></div>
 
+  <!-- API Diagnostic Panel -->
+  <div id="diagPanel" style="display:none; margin-top:20px;">
+    <div class="section-header" style="margin-bottom:10px;">
+      <div class="section-title" style="font-size:14px;">🔬 API Diagnostic</div>
+      <button class="refresh-btn" onclick="hideDiag()" style="font-size:10px;">✕ Close</button>
+    </div>
+    <div id="diagContent" style="background:#0a0a0f;border:1px solid #1e1e2e;border-radius:10px;padding:14px;font-size:11px;color:#a8d8a8;font-family:monospace;white-space:pre-wrap;word-break:break-all;line-height:1.6;max-height:300px;overflow-y:auto;">Running test...</div>
+  </div>
+
   <div class="api-note">
     Live CTA data · Francisco Station (Brown Line)<br>
-    10 min walk + train + 5 min walk to OCC
+    10 min walk + train + 5 min walk to OCC<br><br>
+    <span onclick="runDiag()" style="color:var(--brown-light);cursor:pointer;text-decoration:underline;">🔬 Test API connection</span>
   </div>
 
 </div>
@@ -776,6 +786,126 @@ function selectTrain(info) {
       </div>
     </div>
   </div>`;
+}
+
+// Diagnostic tool
+async function runDiag() {
+  const panel = document.getElementById('diagPanel');
+  const box = document.getElementById('diagContent');
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  box.style.color = '#a8d8a8';
+  box.textContent = 'Testing CTA API...
+
+URL: https://lapi.transitchicago.com/api/1.0/ttarrivals.aspx
+Key: ' + API_KEY.substring(0,8) + '...
+Map ID: ' + FRANCISCO_MAP_ID + '
+
+Sending request...';
+
+  const url = `https://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=${API_KEY}&mapid=${FRANCISCO_MAP_ID}&max=3&outputType=JSON`;
+
+  try {
+    const start = Date.now();
+    const resp = await fetch(url);
+    const elapsed = Date.now() - start;
+
+    let resultText = `HTTP Status: ${resp.status} ${resp.statusText}
+Response time: ${elapsed}ms
+
+`;
+
+    if (!resp.ok) {
+      box.style.color = '#f87171';
+      box.textContent = resultText + `ERROR: Server returned HTTP ${resp.status}
+Your API key may be invalid or not yet activated.`;
+      return;
+    }
+
+    const raw = await resp.text();
+    resultText += 'Raw response:
+' + raw;
+
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch(e) {
+      box.style.color = '#f87171';
+      box.textContent = resultText + '
+
+ERROR: Response is not valid JSON.';
+      return;
+    }
+
+    const root = data?.ctatt;
+    const errCd = root?.errCd?.[0] || root?.errCd;
+    const errNm = root?.errNm?.[0] || root?.errNm;
+
+    if (errCd && errCd !== '0') {
+      box.style.color = '#f5a623';
+      box.textContent = `❌ CTA API Error
+
+Error code: ${errCd}
+Error message: ${errNm}
+
+` +
+        (errNm?.toLowerCase().includes('key') || errNm?.toLowerCase().includes('auth')
+          ? 'Your API key is not activated yet.
+Email: webmaster@transitchicago.com
+Ask them to activate key: ' + API_KEY
+          : 'Check the error message above.') +
+        `
+
+Full response:
+${JSON.stringify(data, null, 2)}`;
+      return;
+    }
+
+    const etas = root?.eta;
+    if (!etas || (Array.isArray(etas) && etas.length === 0)) {
+      box.style.color = '#f5a623';
+      box.textContent = `⚠️ API connected but no trains returned.
+
+This is normal late at night when service ends.
+Try again during service hours (approx 4am–1am).
+
+Full response:
+${JSON.stringify(data, null, 2)}`;
+      return;
+    }
+
+    const etaArr = Array.isArray(etas) ? etas : [etas];
+    box.style.color = '#4ade80';
+    box.textContent = `✅ API is working!
+
+Found ${etaArr.length} upcoming train(s) at Francisco.
+
+Next trains:
+` +
+      etaArr.slice(0,3).map(e => `  · ${e.rt} → ${e.destNm} arriving ${e.arrT}`).join('
+') +
+      `
+
+Response time: ${elapsed}ms
+
+If you still see demo mode in the main list,
+try hitting ↻ Refresh.`;
+
+  } catch(err) {
+    box.style.color = '#f87171';
+    box.textContent = `❌ Network error — could not reach CTA servers.
+
+Error: ${err.message}
+
+Possible causes:
+  · No internet connection
+  · CTA servers are down
+  · CORS blocked (only happens if not on GitHub Pages)`;
+  }
+}
+
+function hideDiag() {
+  document.getElementById('diagPanel').style.display = 'none';
 }
 
 // Init
