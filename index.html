@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCC Commute</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --border: #1e1e2e;
+    --brown: #7c5cbf;
+    --brown-light: #9b7fd4;
+    --accent: #f5a623;
+    --text: #e8e8f0;
+    --muted: #5a5a72;
+    --green: #4ade80;
+    --red: #f87171;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,92,191,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,92,191,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 24px 20px 40px;
+  }
+
+  /* Header */
+  .header {
+    margin-bottom: 32px;
+  }
+
+  .header-label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--brown-light);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .header h1 span {
+    color: var(--accent);
+  }
+
+  .current-time {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* Route card */
+  .route-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .route-title {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .route-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 10px 0;
+    position: relative;
+  }
+
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 32px;
+    bottom: -10px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .step-dot {
+    width: 23px;
+    height: 23px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 500;
+    margin-top: 1px;
+  }
+
+  .step-dot.walk { background: var(--border); color: var(--muted); }
+  .step-dot.train { background: var(--brown); color: white; font-size: 9px; }
+  .step-dot.dest { background: var(--accent); color: #000; }
+
+  .step-info { flex: 1; }
+  .step-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .step-detail { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .step-time {
+    font-size: 11px;
+    color: var(--brown-light);
+    font-weight: 500;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  /* Trains section */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .refresh-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--brown-light);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .refresh-btn:hover {
+    border-color: var(--brown);
+    color: var(--brown-light);
+    background: rgba(124,92,191,0.1);
+  }
+
+  .refresh-btn.loading {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* Train items */
+  .trains-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .train-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .train-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--brown);
+    border-radius: 3px 0 0 3px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .train-item:hover, .train-item.selected {
+    border-color: var(--brown);
+    background: rgba(124,92,191,0.08);
+  }
+
+  .train-item:hover::before, .train-item.selected::before {
+    opacity: 1;
+  }
+
+  .train-item.selected {
+    border-color: var(--brown-light);
+  }
+
+  .train-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .train-route {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .line-badge {
+    background: var(--brown);
+    color: white;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    padding: 2px 7px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  .train-dest {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .train-arr {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .train-arr.soon { color: var(--accent); }
+  .train-arr.now { color: var(--green); }
+
+  .train-mins-label {
+    font-size: 10px;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  .train-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .train-depart {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .depart-highlight {
+    color: var(--text);
+  }
+
+  .feasibility {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+
+  .feas-yes {
+    background: rgba(74,222,128,0.12);
+    color: var(--green);
+    border: 1px solid rgba(74,222,128,0.2);
+  }
+
+  .feas-tight {
+    background: rgba(245,166,35,0.12);
+    color: var(--accent);
+    border: 1px solid rgba(245,166,35,0.2);
+  }
+
+  .feas-no {
+    background: rgba(248,113,113,0.1);
+    color: var(--red);
+    border: 1px solid rgba(248,113,113,0.2);
+  }
+
+  /* Selected summary */
+  .summary-card {
+    background: rgba(124,92,191,0.1);
+    border: 1px solid var(--brown);
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
+    animation: fadeUp 0.3s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .summary-title {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--brown-light);
+    margin-bottom: 14px;
+  }
+
+  .summary-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(30,30,46,0.8);
+  }
+
+  .summary-row:last-child { border-bottom: none; }
+
+  .summary-label { font-size: 11px; color: var(--muted); }
+  .summary-value { font-size: 12px; color: var(--text); font-weight: 500; }
+  .summary-value.arrival { color: var(--accent); font-family: 'Syne', sans-serif; font-size: 18px; }
+
+  /* Status messages */
+  .status-msg {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .status-msg .icon {
+    font-size: 28px;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .error-msg {
+    color: var(--red);
+    background: rgba(248,113,113,0.08);
+    border: 1px solid rgba(248,113,113,0.2);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--brown-light);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Buffer selector */
+  .buffer-section {
+    margin-bottom: 20px;
+  }
+
+  .buffer-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .buffer-options {
+    display: flex;
+    gap: 8px;
+  }
+
+  .buffer-btn {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 10px 0;
+    border-radius: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .buffer-btn:hover {
+    border-color: var(--brown);
+    color: var(--text);
+  }
+
+  .buffer-btn.active {
+    background: rgba(124,92,191,0.15);
+    border-color: var(--brown-light);
+    color: var(--brown-light);
+    font-weight: 500;
+  }
+
+  .buffer-btn .buf-min {
+    display: block;
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: inherit;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  .buffer-btn .buf-label {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .api-note {
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 24px;
+    line-height: 1.5;
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="header-label">Your Daily Commute</div>
+    <h1>OCC <span>Chicago</span></h1>
+    <div class="current-time" id="currentTime"></div>
+  </div>
+
+  <!-- Route Overview -->
+  <div class="route-card">
+    <div class="route-title">Route Overview</div>
+    <div class="route-steps">
+      <div class="step">
+        <div class="step-dot walk">🚶</div>
+        <div class="step-info">
+          <div class="step-name">Walk to Francisco</div>
+          <div class="step-detail">Brown Line · Loop-bound</div>
+        </div>
+        <div class="step-time">10 min</div>
+      </div>
+      <div class="step">
+        <div class="step-dot train">BRN</div>
+        <div class="step-info">
+          <div class="step-name">Francisco → Quincy</div>
+          <div class="step-detail">~18 min ride</div>
+        </div>
+        <div class="step-time">varies</div>
+      </div>
+      <div class="step">
+        <div class="step-dot dest">★</div>
+        <div class="step-info">
+          <div class="step-name">Options Clearing Corp</div>
+          <div class="step-detail">Walk from Quincy</div>
+        </div>
+        <div class="step-time">5 min</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buffer selector -->
+  <div class="buffer-section">
+    <div class="buffer-label">Buffer time at office</div>
+    <div class="buffer-options">
+      <button class="buffer-btn" onclick="setBuffer(10)" id="buf-10">
+        <span class="buf-min">10</span>
+        <span class="buf-label">min early</span>
+      </button>
+      <button class="buffer-btn active" onclick="setBuffer(15)" id="buf-15">
+        <span class="buf-min">15</span>
+        <span class="buf-label">min early</span>
+      </button>
+      <button class="buffer-btn" onclick="setBuffer(20)" id="buf-20">
+        <span class="buf-min">20</span>
+        <span class="buf-label">min early</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Upcoming Trains -->
+  <div class="section-header">
+    <div class="section-title">Upcoming Trains</div>
+    <button class="refresh-btn" id="refreshBtn" onclick="fetchTrains()">↻ Refresh</button>
+  </div>
+
+  <div class="trains-list" id="trainsList">
+    <div class="status-msg">
+      <span class="icon">🚂</span>
+      Loading arrivals at Francisco...
+    </div>
+  </div>
+
+  <div id="summarySection"></div>
+
+  <div class="api-note">
+    Live CTA data · Francisco Station (Brown Line)<br>
+    10 min walk + train + 5 min walk to OCC
+  </div>
+
+</div>
+
+<script>
+const API_KEY = 'fd3f8a638792464abd6f64d6b929ff9c';
+// Francisco Brown Line stop ID (Loop-bound / toward downtown)
+const FRANCISCO_STOP_ID = '30294'; // Loop-bound platform at Francisco
+const WALK_TO_STATION = 10; // minutes
+const WALK_FROM_QUINCY = 5; // minutes
+const TRAIN_RIDE = 18; // approximate minutes Francisco to Quincy
+
+let selectedTrain = null;
+let bufferMins = 15; // default buffer
+window._lastEtas = null;
+window._isDemo = false;
+
+function setBuffer(mins) {
+  bufferMins = mins;
+  [10, 15, 20].forEach(b => {
+    document.getElementById(`buf-${b}`)?.classList.toggle('active', b === mins);
+  });
+  // Re-render with new buffer if data is cached
+  if (window._lastEtas) renderTrainItems(window._lastEtas, window._isDemo);
+  // Clear summary since timing changed
+  document.getElementById('summarySection').innerHTML = '';
+  selectedTrain = null;
+}
+
+function updateClock() {
+  const now = new Date();
+  const opts = { hour: '2-digit', minute: '2-digit', second: '2-digit', weekday: 'short', month: 'short', day: 'numeric' };
+  document.getElementById('currentTime').textContent = now.toLocaleString('en-US', opts);
+}
+
+function fmtTime(date) {
+  return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+}
+
+function parseCTATime(str) {
+  // CTA format: 20240101 12:34:56
+  const yr = parseInt(str.substring(0,4));
+  const mo = parseInt(str.substring(4,6)) - 1;
+  const dy = parseInt(str.substring(6,8));
+  const hr = parseInt(str.substring(9,11));
+  const mn = parseInt(str.substring(12,14));
+  const sc = parseInt(str.substring(15,17));
+  return new Date(yr, mo, dy, hr, mn, sc);
+}
+
+async function fetchTrains() {
+  const btn = document.getElementById('refreshBtn');
+  const list = document.getElementById('trainsList');
+  btn.classList.add('loading');
+  btn.textContent = '↻ Loading…';
+
+  const url = `https://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=${API_KEY}&stpid=${FRANCISCO_STOP_ID}&max=8&outputType=JSON`;
+
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+
+    const root = data?.ctatt;
+    if (!root) throw new Error('Invalid API response');
+
+    const errCd = root.errCd?.[0] || root.errCd;
+    if (errCd && errCd !== '0') {
+      const errNm = root.errNm?.[0] || root.errNm || 'Unknown CTA error';
+      throw new Error(`CTA API: ${errNm}`);
+    }
+
+    let etas = root.eta;
+    if (!etas) {
+      list.innerHTML = `<div class="status-msg"><span class="icon">😴</span>No upcoming trains found.<br>Service may be suspended or ended for the night.</div>`;
+      return;
+    }
+    if (!Array.isArray(etas)) etas = [etas];
+
+    const brn = etas.filter(e => e.rt === 'Brn');
+    if (brn.length === 0) {
+      list.innerHTML = `<div class="status-msg"><span class="icon">🟤</span>No Brown Line trains currently showing.<br>Try refreshing in a moment.</div>`;
+      return;
+    }
+
+    renderTrains(brn);
+  } catch (err) {
+    console.error(err);
+    list.innerHTML = `<div class="error-msg">⚠️ Could not load live data — showing demo times.<br><small style="opacity:0.7">(CORS restriction; works on GitHub Pages)</small></div>`;
+    renderDemoTrains();
+  } finally {
+    btn.classList.remove('loading');
+    btn.textContent = '↻ Refresh';
+  }
+}
+
+function renderDemoTrains() {
+  const now = new Date();
+  const items = [5, 12, 22, 35, 48].map((mins, i) => ({
+    arrT: new Date(now.getTime() + mins * 60000),
+    destNm: 'Loop',
+    isApp: mins <= 1,
+    isSch: i % 3 === 0
+  }));
+  window._lastEtas = items;
+  window._isDemo = true;
+  renderTrainItems(items, true);
+}
+
+function renderTrains(etas) {
+  const now = new Date();
+  const items = etas.map(e => ({
+    arrT: parseCTATime(e.arrT),
+    destNm: e.destNm,
+    isApp: e.isApp === '1',
+    isSch: e.isSch === '1'
+  })).sort((a, b) => a.arrT - b.arrT);
+
+  window._lastEtas = items;
+  window._isDemo = false;
+  renderTrainItems(items, false);
+}
+
+function renderTrainItems(items, isDemo) {
+  const list = document.getElementById('trainsList');
+  const now = new Date();
+
+  const demoNote = isDemo
+    ? `<div class="error-msg" style="margin-bottom:12px;font-size:11px;">⚠️ <strong>Demo mode</strong> — times are illustrative. Host on GitHub Pages for live CTA data.</div>`
+    : '';
+
+  list.innerHTML = demoNote + items.map((t, i) => {
+    const minsToTrain = Math.round((t.arrT - now) / 60000);
+    const minsDisplay = minsToTrain <= 0 ? 'DUE' : `${minsToTrain}`;
+    const minsLabel = minsToTrain <= 0 ? 'arriving now' : minsToTrain === 1 ? 'min away' : 'mins away';
+    const arrClass = minsToTrain <= 1 ? 'now' : minsToTrain <= 5 ? 'soon' : '';
+
+    // Must leave home (WALK_TO_STATION) mins before train, but also account for buffer
+    // "Leave home" = train arrival at Francisco minus walk time
+    // "Need to be at OCC by" = train at Quincy + walk = arrT + TRAIN_RIDE + WALK_FROM_QUINCY
+    // Buffer means: you want to arrive (bufferMins) early, so you target arriving at OCC that many mins before needed
+    // For the train list, feasibility is purely based on: can you make the walk in time?
+    const leaveAt = new Date(t.arrT.getTime() - WALK_TO_STATION * 60000);
+    const arriveOCC = new Date(t.arrT.getTime() + TRAIN_RIDE * 60000 + WALK_FROM_QUINCY * 60000);
+    const leaveInMins = Math.round((leaveAt - now) / 60000);
+
+    // Target depart to arrive at OCC with buffer: work backward from (OCC arrival - bufferMins)
+    // i.e. need to be at Quincy (bufferMins + WALK_FROM_QUINCY) mins before work start
+    // But since we don't know work start time, buffer just means: show when to leave to arrive (buffer) mins before this train's OCC arrival
+    // More practically: leaveAt is fixed by the train. bufferMins just annotates how much cushion you get.
+    const cushion = Math.round((arriveOCC - now) / 60000) - (WALK_TO_STATION + TRAIN_RIDE + WALK_FROM_QUINCY);
+
+    let feasClass, feasLabel;
+    if (leaveInMins < -2) {
+      feasClass = 'feas-no'; feasLabel = 'MISSED';
+    } else if (leaveInMins <= 2) {
+      feasClass = 'feas-tight'; feasLabel = leaveInMins <= 0 ? 'LEAVE NOW' : `GO IN ${leaveInMins}m`;
+    } else {
+      feasClass = 'feas-yes'; feasLabel = `LEAVE ${fmtTime(leaveAt)}`;
+    }
+
+    // Encode data for onclick
+    const data = {
+      idx: i,
+      dest: t.destNm || 'Loop',
+      arrStation: fmtTime(t.arrT),
+      leaveHome: fmtTime(leaveAt),
+      arrOCC: fmtTime(arriveOCC),
+      leaveInMins,
+      feasClass,
+      feasLabel,
+      trainArrMs: t.arrT.getTime()
+    };
+
+    return `
+    <div class="train-item" id="train-${i}" onclick='selectTrain(${JSON.stringify(data)})'>
+      <div class="train-top">
+        <div class="train-route">
+          <span class="line-badge">Brown</span>
+          <span class="train-dest">→ ${t.destNm || 'Loop'}</span>
+        </div>
+        <div style="text-align:right">
+          <div class="train-arr ${arrClass}">${minsDisplay}</div>
+          <div class="train-mins-label">${minsLabel}</div>
+        </div>
+      </div>
+      <div class="train-bottom">
+        <div class="train-depart">Arrives Francisco <span class="depart-highlight">${fmtTime(t.arrT)}</span></div>
+        <div class="feasibility ${feasClass}">${feasLabel}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selectTrain(info) {
+  document.querySelectorAll('.train-item').forEach(el => el.classList.remove('selected'));
+  document.getElementById(`train-${info.idx}`)?.classList.add('selected');
+  selectedTrain = info.idx;
+
+  // Recalculate with current bufferMins
+  const trainArr = new Date(info.trainArrMs);
+  const now = new Date();
+  const leaveAt = new Date(trainArr.getTime() - WALK_TO_STATION * 60000);
+  const arriveOCC = new Date(trainArr.getTime() + TRAIN_RIDE * 60000 + WALK_FROM_QUINCY * 60000);
+  // Target departure = arrive at OCC bufferMins early → depart home earlier
+  const targetLeave = new Date(leaveAt.getTime() - bufferMins * 60000);
+  const targetArr = new Date(arriveOCC.getTime()); // actual arrival (buffer is just comfort)
+  const leaveInMins = Math.round((leaveAt - now) / 60000);
+  const targetLeaveIn = Math.round((targetLeave - now) / 60000);
+
+  const leaveMsg = leaveInMins <= 0 ? '⚠️ Leave immediately!' :
+    leaveInMins <= 3 ? `⚡ Leave in ${leaveInMins} min` :
+    `Leave in ${leaveInMins} min`;
+
+  const bufferLeaveMsg = targetLeaveIn <= 0 ? '⚠️ Should have left already!' :
+    `Leave in ${targetLeaveIn} min for ${bufferMins}min buffer`;
+
+  document.getElementById('summarySection').innerHTML = `
+  <div class="summary-card">
+    <div class="summary-title">Trip Plan · +${bufferMins}min buffer · → ${info.dest}</div>
+    <div class="summary-timeline">
+      <div class="summary-row">
+        <span class="summary-label">⏰ Leave (w/ buffer)</span>
+        <span class="summary-value">${fmtTime(targetLeave)} <small style="color:var(--accent)">${bufferLeaveMsg}</small></span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">🏠 Latest departure</span>
+        <span class="summary-value">${fmtTime(leaveAt)} &nbsp;<small style="color:var(--brown-light)">${leaveMsg}</small></span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">🚶 Walk to Francisco</span>
+        <span class="summary-value">10 min</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">🚂 Board at Francisco</span>
+        <span class="summary-value">${fmtTime(trainArr)}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">🚂 Ride to Quincy</span>
+        <span class="summary-value">~18 min</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">🚶 Walk to OCC</span>
+        <span class="summary-value">5 min</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">🏢 Arrive at OCC</span>
+        <span class="summary-value arrival">${fmtTime(arriveOCC)}</span>
+      </div>
+      <div class="summary-row" style="border-top: 1px solid var(--brown); margin-top:4px; padding-top:10px">
+        <span class="summary-label" style="color:var(--brown-light)">🛡 Buffer cushion</span>
+        <span class="summary-value" style="color:var(--brown-light)">${bufferMins} min early</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+// Init
+updateClock();
+setInterval(updateClock, 1000);
+fetchTrains();
+setInterval(fetchTrains, 60000);
+</script>
+</body>
+</html>
