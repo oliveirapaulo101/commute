@@ -509,24 +509,24 @@
         <div class="step-time">5 min</div>
       </div>
     </div>
-  </div>
 
-  <!-- Buffer selector -->
-  <div class="buffer-section">
-    <div class="buffer-label">Buffer time at office</div>
-    <div class="buffer-options">
-      <button class="buffer-btn" onclick="setBuffer(10)" id="buf-10">
-        <span class="buf-min">10</span>
-        <span class="buf-label">min early</span>
-      </button>
-      <button class="buffer-btn active" onclick="setBuffer(15)" id="buf-15">
-        <span class="buf-min">15</span>
-        <span class="buf-label">min early</span>
-      </button>
-      <button class="buffer-btn" onclick="setBuffer(20)" id="buf-20">
-        <span class="buf-min">20</span>
-        <span class="buf-label">min early</span>
-      </button>
+    <!-- Buffer baked into route card -->
+    <div style="border-top: 1px solid var(--border); margin-top: 14px; padding-top: 14px;">
+      <div class="buffer-label" style="margin-bottom:10px;">Arrive early by</div>
+      <div class="buffer-options">
+        <button class="buffer-btn" onclick="setBuffer(10)" id="buf-10">
+          <span class="buf-min">10</span>
+          <span class="buf-label">min</span>
+        </button>
+        <button class="buffer-btn active" onclick="setBuffer(15)" id="buf-15">
+          <span class="buf-min">15</span>
+          <span class="buf-label">min</span>
+        </button>
+        <button class="buffer-btn" onclick="setBuffer(20)" id="buf-20">
+          <span class="buf-min">20</span>
+          <span class="buf-label">min</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -555,7 +555,7 @@
 <script>
 const API_KEY = 'fd3f8a638792464abd6f64d6b929ff9c';
 // Francisco Brown Line stop ID (Loop-bound / toward downtown)
-const FRANCISCO_STOP_ID = '30294'; // Loop-bound platform at Francisco
+const FRANCISCO_MAP_ID = '41800'; // Francisco station map ID (Brown Line)
 const WALK_TO_STATION = 10; // minutes
 const WALK_FROM_QUINCY = 5; // minutes
 const TRAIN_RIDE = 18; // approximate minutes Francisco to Quincy
@@ -604,7 +604,7 @@ async function fetchTrains() {
   btn.classList.add('loading');
   btn.textContent = '↻ Loading…';
 
-  const url = `https://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=${API_KEY}&stpid=${FRANCISCO_STOP_ID}&max=8&outputType=JSON`;
+  const url = `https://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=${API_KEY}&mapid=${FRANCISCO_MAP_ID}&max=8&outputType=JSON`;
 
   try {
     const resp = await fetch(url);
@@ -636,7 +636,7 @@ async function fetchTrains() {
     renderTrains(brn);
   } catch (err) {
     console.error(err);
-    list.innerHTML = `<div class="error-msg">⚠️ Could not load live data — showing demo times.<br><small style="opacity:0.7">(CORS restriction; works on GitHub Pages)</small></div>`;
+    list.innerHTML = `<div class="error-msg" style="margin-bottom:12px">⚠️ Could not reach CTA API.<br><small style="opacity:0.8">Error: ${err.message}</small><br><small style="opacity:0.6">Showing demo times below.</small></div>`;
     renderDemoTrains();
   } finally {
     btn.classList.remove('loading');
@@ -685,20 +685,11 @@ function renderTrainItems(items, isDemo) {
     const minsLabel = minsToTrain <= 0 ? 'arriving now' : minsToTrain === 1 ? 'min away' : 'mins away';
     const arrClass = minsToTrain <= 1 ? 'now' : minsToTrain <= 5 ? 'soon' : '';
 
-    // Must leave home (WALK_TO_STATION) mins before train, but also account for buffer
-    // "Leave home" = train arrival at Francisco minus walk time
-    // "Need to be at OCC by" = train at Quincy + walk = arrT + TRAIN_RIDE + WALK_FROM_QUINCY
-    // Buffer means: you want to arrive (bufferMins) early, so you target arriving at OCC that many mins before needed
-    // For the train list, feasibility is purely based on: can you make the walk in time?
-    const leaveAt = new Date(t.arrT.getTime() - WALK_TO_STATION * 60000);
+    // Buffer baked in: leave home = train arrival - walk - buffer
+    // This means the "leave home" time is already early enough to arrive bufferMins before the train
+    const leaveAt = new Date(t.arrT.getTime() - WALK_TO_STATION * 60000 - bufferMins * 60000);
     const arriveOCC = new Date(t.arrT.getTime() + TRAIN_RIDE * 60000 + WALK_FROM_QUINCY * 60000);
     const leaveInMins = Math.round((leaveAt - now) / 60000);
-
-    // Target depart to arrive at OCC with buffer: work backward from (OCC arrival - bufferMins)
-    // i.e. need to be at Quincy (bufferMins + WALK_FROM_QUINCY) mins before work start
-    // But since we don't know work start time, buffer just means: show when to leave to arrive (buffer) mins before this train's OCC arrival
-    // More practically: leaveAt is fixed by the train. bufferMins just annotates how much cushion you get.
-    const cushion = Math.round((arriveOCC - now) / 60000) - (WALK_TO_STATION + TRAIN_RIDE + WALK_FROM_QUINCY);
 
     let feasClass, feasLabel;
     if (leaveInMins < -2) {
@@ -709,16 +700,9 @@ function renderTrainItems(items, isDemo) {
       feasClass = 'feas-yes'; feasLabel = `LEAVE ${fmtTime(leaveAt)}`;
     }
 
-    // Encode data for onclick
     const data = {
       idx: i,
       dest: t.destNm || 'Loop',
-      arrStation: fmtTime(t.arrT),
-      leaveHome: fmtTime(leaveAt),
-      arrOCC: fmtTime(arriveOCC),
-      leaveInMins,
-      feasClass,
-      feasLabel,
       trainArrMs: t.arrT.getTime()
     };
 
@@ -735,7 +719,7 @@ function renderTrainItems(items, isDemo) {
         </div>
       </div>
       <div class="train-bottom">
-        <div class="train-depart">Arrives Francisco <span class="depart-highlight">${fmtTime(t.arrT)}</span></div>
+        <div class="train-depart">Depart home <span class="depart-highlight">${fmtTime(leaveAt)}</span></div>
         <div class="feasibility ${feasClass}">${feasLabel}</div>
       </div>
     </div>`;
@@ -747,59 +731,48 @@ function selectTrain(info) {
   document.getElementById(`train-${info.idx}`)?.classList.add('selected');
   selectedTrain = info.idx;
 
-  // Recalculate with current bufferMins
   const trainArr = new Date(info.trainArrMs);
   const now = new Date();
-  const leaveAt = new Date(trainArr.getTime() - WALK_TO_STATION * 60000);
-  const arriveOCC = new Date(trainArr.getTime() + TRAIN_RIDE * 60000 + WALK_FROM_QUINCY * 60000);
-  // Target departure = arrive at OCC bufferMins early → depart home earlier
-  const targetLeave = new Date(leaveAt.getTime() - bufferMins * 60000);
-  const targetArr = new Date(arriveOCC.getTime()); // actual arrival (buffer is just comfort)
-  const leaveInMins = Math.round((leaveAt - now) / 60000);
-  const targetLeaveIn = Math.round((targetLeave - now) / 60000);
 
-  const leaveMsg = leaveInMins <= 0 ? '⚠️ Leave immediately!' :
+  // Buffer baked in throughout
+  const leaveAt = new Date(trainArr.getTime() - WALK_TO_STATION * 60000 - bufferMins * 60000);
+  const arriveStation = new Date(leaveAt.getTime() + WALK_TO_STATION * 60000);
+  const arriveQuincy = new Date(trainArr.getTime() + TRAIN_RIDE * 60000);
+  const arriveOCC = new Date(arriveQuincy.getTime() + WALK_FROM_QUINCY * 60000);
+  const leaveInMins = Math.round((leaveAt - now) / 60000);
+  const totalMins = WALK_TO_STATION + bufferMins + TRAIN_RIDE + WALK_FROM_QUINCY;
+
+  const urgency = leaveInMins <= 0 ? '⚠️ Leave immediately!' :
     leaveInMins <= 3 ? `⚡ Leave in ${leaveInMins} min` :
     `Leave in ${leaveInMins} min`;
 
-  const bufferLeaveMsg = targetLeaveIn <= 0 ? '⚠️ Should have left already!' :
-    `Leave in ${targetLeaveIn} min for ${bufferMins}min buffer`;
-
   document.getElementById('summarySection').innerHTML = `
   <div class="summary-card">
-    <div class="summary-title">Trip Plan · +${bufferMins}min buffer · → ${info.dest}</div>
+    <div class="summary-title">Trip Plan · ${bufferMins}min early · → ${info.dest}</div>
     <div class="summary-timeline">
       <div class="summary-row">
-        <span class="summary-label">⏰ Leave (w/ buffer)</span>
-        <span class="summary-value">${fmtTime(targetLeave)} <small style="color:var(--accent)">${bufferLeaveMsg}</small></span>
+        <span class="summary-label">🏠 Leave home</span>
+        <span class="summary-value">${fmtTime(leaveAt)} &nbsp;<small style="color:var(--brown-light)">${urgency}</small></span>
       </div>
       <div class="summary-row">
-        <span class="summary-label">🏠 Latest departure</span>
-        <span class="summary-value">${fmtTime(leaveAt)} &nbsp;<small style="color:var(--brown-light)">${leaveMsg}</small></span>
+        <span class="summary-label">🚶 Walk · 10 min</span>
+        <span class="summary-value">arrive Francisco ${fmtTime(arriveStation)}</span>
       </div>
       <div class="summary-row">
-        <span class="summary-label">🚶 Walk to Francisco</span>
-        <span class="summary-value">10 min</span>
+        <span class="summary-label">🚂 Board · ${fmtTime(trainArr)}</span>
+        <span class="summary-value">ride ~18 min</span>
       </div>
       <div class="summary-row">
-        <span class="summary-label">🚂 Board at Francisco</span>
-        <span class="summary-value">${fmtTime(trainArr)}</span>
+        <span class="summary-label">🚶 Walk · 5 min</span>
+        <span class="summary-value">arrive OCC ${fmtTime(arriveOCC)}</span>
       </div>
-      <div class="summary-row">
-        <span class="summary-label">🚂 Ride to Quincy</span>
-        <span class="summary-value">~18 min</span>
-      </div>
-      <div class="summary-row">
-        <span class="summary-label">🚶 Walk to OCC</span>
-        <span class="summary-value">5 min</span>
-      </div>
-      <div class="summary-row">
-        <span class="summary-label">🏢 Arrive at OCC</span>
+      <div class="summary-row" style="border-top: 1px solid var(--brown); margin-top:6px; padding-top:10px;">
+        <span class="summary-label" style="color:var(--brown-light)">🏢 At desk · ${bufferMins}min early</span>
         <span class="summary-value arrival">${fmtTime(arriveOCC)}</span>
       </div>
-      <div class="summary-row" style="border-top: 1px solid var(--brown); margin-top:4px; padding-top:10px">
-        <span class="summary-label" style="color:var(--brown-light)">🛡 Buffer cushion</span>
-        <span class="summary-value" style="color:var(--brown-light)">${bufferMins} min early</span>
+      <div class="summary-row">
+        <span class="summary-label" style="color:var(--muted)">⏱ Total door-to-desk</span>
+        <span class="summary-value" style="color:var(--muted)">${totalMins} min</span>
       </div>
     </div>
   </div>`;
