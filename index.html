@@ -598,14 +598,25 @@ function fmtTime(date) {
 }
 
 function parseCTATime(str) {
-  // CTA format: 20240101 12:34:56
-  const yr = parseInt(str.substring(0,4));
-  const mo = parseInt(str.substring(4,6)) - 1;
-  const dy = parseInt(str.substring(6,8));
-  const hr = parseInt(str.substring(9,11));
-  const mn = parseInt(str.substring(12,14));
-  const sc = parseInt(str.substring(15,17));
-  return new Date(yr, mo, dy, hr, mn, sc);
+  // CTA format: "20250225 14:30:00" — 8 date chars, space, HH:MM:SS
+  // Also handle ISO format just in case
+  if (!str) return new Date(NaN);
+  try {
+    // Standard CTA format: YYYYMMDD HH:MM:SS
+    if (/^\d{8} \d{2}:\d{2}:\d{2}$/.test(str.trim())) {
+      const yr = parseInt(str.substring(0, 4));
+      const mo = parseInt(str.substring(4, 6)) - 1;
+      const dy = parseInt(str.substring(6, 8));
+      const hr = parseInt(str.substring(9, 11));
+      const mn = parseInt(str.substring(12, 14));
+      const sc = parseInt(str.substring(15, 17));
+      return new Date(yr, mo, dy, hr, mn, sc);
+    }
+    // Fallback: try native Date parse
+    return new Date(str);
+  } catch(e) {
+    return new Date(NaN);
+  }
 }
 
 async function fetchTrains() {
@@ -619,34 +630,40 @@ async function fetchTrains() {
   try {
     const resp = await fetch(url);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const data = await resp.json();
+
+    const raw = await resp.text();
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch(e) {
+      throw new Error('CTA returned invalid JSON: ' + raw.substring(0, 100));
+    }
 
     const root = data?.ctatt;
-    if (!root) throw new Error('Invalid API response');
+    if (!root) throw new Error('No ctatt in response: ' + raw.substring(0, 200));
 
-    const errCd = root.errCd?.[0] || root.errCd;
-    if (errCd && errCd !== '0') {
+    // errCd can be string "0" or integer 0 — coerce to string for comparison
+    const errCd = String(root.errCd?.[0] ?? root.errCd ?? '0');
+    if (errCd !== '0') {
       const errNm = root.errNm?.[0] || root.errNm || 'Unknown CTA error';
-      throw new Error(`CTA API: ${errNm}`);
+      throw new Error(`CTA API error ${errCd}: ${errNm}`);
     }
 
     let etas = root.eta;
-    if (!etas) {
-      list.innerHTML = `<div class="status-msg"><span class="icon">😴</span>No upcoming trains found.<br>Service may be suspended or ended for the night.</div>`;
+    if (!etas || (Array.isArray(etas) && etas.length === 0)) {
+      list.innerHTML = `<div class="status-msg"><span class="icon">😴</span>No upcoming trains found.<br>Service may have ended for the night.</div>`;
       return;
     }
     if (!Array.isArray(etas)) etas = [etas];
 
-    const brn = etas.filter(e => e.rt === 'Brn');
-    if (brn.length === 0) {
-      list.innerHTML = `<div class="status-msg"><span class="icon">🟤</span>No Brown Line trains currently showing.<br>Try refreshing in a moment.</div>`;
-      return;
-    }
+    // mapid returns all lines at the station — filter Brown Line only
+    const brn = etas.filter(e => e.rt === 'Brn' || e.rt === 'Brown');
+    const useEtas = brn.length > 0 ? brn : etas; // fallback: show all if filter returns nothing
 
-    renderTrains(brn);
+    renderTrains(useEtas);
   } catch (err) {
-    console.error(err);
-    list.innerHTML = `<div class="error-msg" style="margin-bottom:12px">⚠️ Could not reach CTA API.<br><small style="opacity:0.8">Error: ${err.message}</small><br><small style="opacity:0.6">Showing demo times below.</small></div>`;
+    console.error('fetchTrains error:', err);
+    list.innerHTML = `<div class="error-msg" style="margin-bottom:12px">⚠️ ${err.message}<br><small style="opacity:0.6;display:block;margin-top:4px;">Tap 🔬 Test API connection below for details. Showing demo times.</small></div>`;
     renderDemoTrains();
   } finally {
     btn.classList.remove('loading');
@@ -668,13 +685,19 @@ function renderDemoTrains() {
 }
 
 function renderTrains(etas) {
-  const now = new Date();
   const items = etas.map(e => ({
     arrT: parseCTATime(e.arrT),
-    destNm: e.destNm,
+    destNm: e.destNm || 'Loop',
     isApp: e.isApp === '1',
     isSch: e.isSch === '1'
-  })).sort((a, b) => a.arrT - b.arrT);
+  })).filter(e => e.arrT instanceof Date && !isNaN(e.arrT))
+     .sort((a, b) => a.arrT - b.arrT);
+
+  if (items.length === 0) {
+    document.getElementById('trainsList').innerHTML =
+      `<div class="status-msg"><span class="icon">🚂</span>No valid arrivals parsed.<br>Tap 🔬 Test API connection to debug.</div>`;
+    return;
+  }
 
   window._lastEtas = items;
   window._isDemo = false;
