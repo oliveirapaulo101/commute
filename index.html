@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -19,457 +20,458 @@
     --red: #f87171;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+- { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    min-height: 100vh;
-    padding: 0;
-    overflow-x: hidden;
-  }
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘DM Mono’, monospace;
+min-height: 100vh;
+padding: 0;
+overflow-x: hidden;
+}
 
-  /* Animated grid background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(124,92,191,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(124,92,191,0.04) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
+/* Animated grid background */
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image:
+linear-gradient(rgba(124,92,191,0.04) 1px, transparent 1px),
+linear-gradient(90deg, rgba(124,92,191,0.04) 1px, transparent 1px);
+background-size: 40px 40px;
+pointer-events: none;
+z-index: 0;
+}
 
-  .app {
-    position: relative;
-    z-index: 1;
-    max-width: 420px;
-    margin: 0 auto;
-    padding: 24px 20px 40px;
-  }
+.app {
+position: relative;
+z-index: 1;
+max-width: 420px;
+margin: 0 auto;
+padding: 24px 20px 40px;
+}
 
-  /* Header */
-  .header {
-    margin-bottom: 32px;
-  }
+/* Header */
+.header {
+margin-bottom: 32px;
+}
 
-  .header-label {
-    font-size: 10px;
-    letter-spacing: 0.25em;
-    color: var(--brown-light);
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
+.header-label {
+font-size: 10px;
+letter-spacing: 0.25em;
+color: var(–brown-light);
+text-transform: uppercase;
+margin-bottom: 4px;
+}
 
-  .header h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-  }
+.header h1 {
+font-family: ‘Syne’, sans-serif;
+font-size: 28px;
+font-weight: 800;
+letter-spacing: -0.02em;
+line-height: 1.1;
+}
 
-  .header h1 span {
-    color: var(--accent);
-  }
+.header h1 span {
+color: var(–accent);
+}
 
-  .current-time {
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 6px;
-  }
+.current-time {
+font-size: 11px;
+color: var(–muted);
+margin-top: 6px;
+}
 
-  /* Route card */
-  .route-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
+/* Route card */
+.route-card {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 16px;
+padding: 20px;
+margin-bottom: 20px;
+}
 
-  .route-title {
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 16px;
-  }
+.route-title {
+font-size: 10px;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+color: var(–muted);
+margin-bottom: 16px;
+}
 
-  .route-steps {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
+.route-steps {
+display: flex;
+flex-direction: column;
+gap: 0;
+}
 
-  .step {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    padding: 10px 0;
-    position: relative;
-  }
+.step {
+display: flex;
+align-items: flex-start;
+gap: 14px;
+padding: 10px 0;
+position: relative;
+}
 
-  .step:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    left: 11px;
-    top: 32px;
-    bottom: -10px;
-    width: 1px;
-    background: var(--border);
-  }
+.step:not(:last-child)::after {
+content: ‘’;
+position: absolute;
+left: 11px;
+top: 32px;
+bottom: -10px;
+width: 1px;
+background: var(–border);
+}
 
-  .step-dot {
-    width: 23px;
-    height: 23px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    font-weight: 500;
-    margin-top: 1px;
-  }
+.step-dot {
+width: 23px;
+height: 23px;
+border-radius: 50%;
+flex-shrink: 0;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 10px;
+font-weight: 500;
+margin-top: 1px;
+}
 
-  .step-dot.walk { background: var(--border); color: var(--muted); }
-  .step-dot.train { background: var(--brown); color: white; font-size: 9px; }
-  .step-dot.dest { background: var(--accent); color: #000; }
+.step-dot.walk { background: var(–border); color: var(–muted); }
+.step-dot.train { background: var(–brown); color: white; font-size: 9px; }
+.step-dot.dest { background: var(–accent); color: #000; }
 
-  .step-info { flex: 1; }
-  .step-name { font-size: 13px; font-weight: 500; color: var(--text); }
-  .step-detail { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.step-info { flex: 1; }
+.step-name { font-size: 13px; font-weight: 500; color: var(–text); }
+.step-detail { font-size: 11px; color: var(–muted); margin-top: 2px; }
 
-  .step-time {
-    font-size: 11px;
-    color: var(--brown-light);
-    font-weight: 500;
-    white-space: nowrap;
-    margin-top: 2px;
-  }
+.step-time {
+font-size: 11px;
+color: var(–brown-light);
+font-weight: 500;
+white-space: nowrap;
+margin-top: 2px;
+}
 
-  /* Trains section */
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
-  }
+/* Trains section */
+.section-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 14px;
+}
 
-  .section-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-  }
+.section-title {
+font-family: ‘Syne’, sans-serif;
+font-size: 16px;
+font-weight: 700;
+}
 
-  .refresh-btn {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--brown-light);
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
+.refresh-btn {
+background: var(–surface);
+border: 1px solid var(–border);
+color: var(–brown-light);
+padding: 6px 12px;
+border-radius: 8px;
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+cursor: pointer;
+transition: all 0.2s;
+}
 
-  .refresh-btn:hover {
-    border-color: var(--brown);
-    color: var(--brown-light);
-    background: rgba(124,92,191,0.1);
-  }
+.refresh-btn:hover {
+border-color: var(–brown);
+color: var(–brown-light);
+background: rgba(124,92,191,0.1);
+}
 
-  .refresh-btn.loading {
-    opacity: 0.5;
-    pointer-events: none;
-  }
+.refresh-btn.loading {
+opacity: 0.5;
+pointer-events: none;
+}
 
-  /* Train items */
-  .trains-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+/* Train items */
+.trains-list {
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
 
-  .train-item {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
+.train-item {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 12px;
+padding: 16px;
+cursor: pointer;
+transition: all 0.2s;
+position: relative;
+overflow: hidden;
+}
 
-  .train-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--brown);
-    border-radius: 3px 0 0 3px;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
+.train-item::before {
+content: ‘’;
+position: absolute;
+left: 0;
+top: 0;
+bottom: 0;
+width: 3px;
+background: var(–brown);
+border-radius: 3px 0 0 3px;
+opacity: 0;
+transition: opacity 0.2s;
+}
 
-  .train-item:hover, .train-item.selected {
-    border-color: var(--brown);
-    background: rgba(124,92,191,0.08);
-  }
+.train-item:hover, .train-item.selected {
+border-color: var(–brown);
+background: rgba(124,92,191,0.08);
+}
 
-  .train-item:hover::before, .train-item.selected::before {
-    opacity: 1;
-  }
+.train-item:hover::before, .train-item.selected::before {
+opacity: 1;
+}
 
-  .train-item.selected {
-    border-color: var(--brown-light);
-  }
+.train-item.selected {
+border-color: var(–brown-light);
+}
 
-  .train-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
-  }
+.train-top {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 8px;
+}
 
-  .train-route {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+.train-route {
+display: flex;
+align-items: center;
+gap: 8px;
+}
 
-  .line-badge {
-    background: var(--brown);
-    color: white;
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    padding: 2px 7px;
-    border-radius: 4px;
-    text-transform: uppercase;
-  }
+.line-badge {
+background: var(–brown);
+color: white;
+font-size: 9px;
+font-weight: 500;
+letter-spacing: 0.1em;
+padding: 2px 7px;
+border-radius: 4px;
+text-transform: uppercase;
+}
 
-  .train-dest {
-    font-size: 12px;
-    color: var(--muted);
-  }
+.train-dest {
+font-size: 12px;
+color: var(–muted);
+}
 
-  .train-arr {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--text);
-  }
+.train-arr {
+font-family: ‘Syne’, sans-serif;
+font-size: 22px;
+font-weight: 700;
+color: var(–text);
+}
 
-  .train-arr.soon { color: var(--accent); }
-  .train-arr.now { color: var(--green); }
+.train-arr.soon { color: var(–accent); }
+.train-arr.now { color: var(–green); }
 
-  .train-mins-label {
-    font-size: 10px;
-    color: var(--muted);
-    text-align: right;
-  }
+.train-mins-label {
+font-size: 10px;
+color: var(–muted);
+text-align: right;
+}
 
-  .train-bottom {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+.train-bottom {
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
 
-  .train-depart {
-    font-size: 11px;
-    color: var(--muted);
-  }
+.train-depart {
+font-size: 11px;
+color: var(–muted);
+}
 
-  .depart-highlight {
-    color: var(--text);
-  }
+.depart-highlight {
+color: var(–text);
+}
 
-  .feasibility {
-    font-size: 10px;
-    padding: 3px 8px;
-    border-radius: 20px;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-  }
+.feasibility {
+font-size: 10px;
+padding: 3px 8px;
+border-radius: 20px;
+font-weight: 500;
+letter-spacing: 0.05em;
+}
 
-  .feas-yes {
-    background: rgba(74,222,128,0.12);
-    color: var(--green);
-    border: 1px solid rgba(74,222,128,0.2);
-  }
+.feas-yes {
+background: rgba(74,222,128,0.12);
+color: var(–green);
+border: 1px solid rgba(74,222,128,0.2);
+}
 
-  .feas-tight {
-    background: rgba(245,166,35,0.12);
-    color: var(--accent);
-    border: 1px solid rgba(245,166,35,0.2);
-  }
+.feas-tight {
+background: rgba(245,166,35,0.12);
+color: var(–accent);
+border: 1px solid rgba(245,166,35,0.2);
+}
 
-  .feas-no {
-    background: rgba(248,113,113,0.1);
-    color: var(--red);
-    border: 1px solid rgba(248,113,113,0.2);
-  }
+.feas-no {
+background: rgba(248,113,113,0.1);
+color: var(–red);
+border: 1px solid rgba(248,113,113,0.2);
+}
 
-  /* Selected summary */
-  .summary-card {
-    background: rgba(124,92,191,0.1);
-    border: 1px solid var(--brown);
-    border-radius: 16px;
-    padding: 20px;
-    margin-top: 20px;
-    animation: fadeUp 0.3s ease;
-  }
+/* Selected summary */
+.summary-card {
+background: rgba(124,92,191,0.1);
+border: 1px solid var(–brown);
+border-radius: 16px;
+padding: 20px;
+margin-top: 20px;
+animation: fadeUp 0.3s ease;
+}
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(10px); }
+to { opacity: 1; transform: translateY(0); }
+}
 
-  .summary-title {
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--brown-light);
-    margin-bottom: 14px;
-  }
+.summary-title {
+font-size: 10px;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+color: var(–brown-light);
+margin-bottom: 14px;
+}
 
-  .summary-timeline {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
+.summary-timeline {
+display: flex;
+flex-direction: column;
+gap: 8px;
+}
 
-  .summary-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 0;
-    border-bottom: 1px solid rgba(30,30,46,0.8);
-  }
+.summary-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 6px 0;
+border-bottom: 1px solid rgba(30,30,46,0.8);
+}
 
-  .summary-row:last-child { border-bottom: none; }
+.summary-row:last-child { border-bottom: none; }
 
-  .summary-label { font-size: 11px; color: var(--muted); }
-  .summary-value { font-size: 12px; color: var(--text); font-weight: 500; }
-  .summary-value.arrival { color: var(--accent); font-family: 'Syne', sans-serif; font-size: 18px; }
+.summary-label { font-size: 11px; color: var(–muted); }
+.summary-value { font-size: 12px; color: var(–text); font-weight: 500; }
+.summary-value.arrival { color: var(–accent); font-family: ‘Syne’, sans-serif; font-size: 18px; }
 
-  /* Status messages */
-  .status-msg {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.6;
-  }
+/* Status messages */
+.status-msg {
+text-align: center;
+padding: 40px 20px;
+color: var(–muted);
+font-size: 12px;
+line-height: 1.6;
+}
 
-  .status-msg .icon {
-    font-size: 28px;
-    display: block;
-    margin-bottom: 10px;
-  }
+.status-msg .icon {
+font-size: 28px;
+display: block;
+margin-bottom: 10px;
+}
 
-  .error-msg {
-    color: var(--red);
-    background: rgba(248,113,113,0.08);
-    border: 1px solid rgba(248,113,113,0.2);
-    border-radius: 10px;
-    padding: 14px;
-    font-size: 12px;
-    line-height: 1.5;
-  }
+.error-msg {
+color: var(–red);
+background: rgba(248,113,113,0.08);
+border: 1px solid rgba(248,113,113,0.2);
+border-radius: 10px;
+padding: 14px;
+font-size: 12px;
+line-height: 1.5;
+}
 
-  .spinner {
-    display: inline-block;
-    width: 16px; height: 16px;
-    border: 2px solid var(--border);
-    border-top-color: var(--brown-light);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    vertical-align: middle;
-    margin-right: 6px;
-  }
+.spinner {
+display: inline-block;
+width: 16px; height: 16px;
+border: 2px solid var(–border);
+border-top-color: var(–brown-light);
+border-radius: 50%;
+animation: spin 0.7s linear infinite;
+vertical-align: middle;
+margin-right: 6px;
+}
 
-  @keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-  /* Buffer selector */
-  .buffer-section {
-    margin-bottom: 20px;
-  }
+/* Buffer selector */
+.buffer-section {
+margin-bottom: 20px;
+}
 
-  .buffer-label {
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 10px;
-  }
+.buffer-label {
+font-size: 10px;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+color: var(–muted);
+margin-bottom: 10px;
+}
 
-  .buffer-options {
-    display: flex;
-    gap: 8px;
-  }
+.buffer-options {
+display: flex;
+gap: 8px;
+}
 
-  .buffer-btn {
-    flex: 1;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    padding: 10px 0;
-    border-radius: 10px;
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-  }
+.buffer-btn {
+flex: 1;
+background: var(–surface);
+border: 1px solid var(–border);
+color: var(–muted);
+padding: 10px 0;
+border-radius: 10px;
+font-family: ‘DM Mono’, monospace;
+font-size: 13px;
+cursor: pointer;
+transition: all 0.2s;
+text-align: center;
+}
 
-  .buffer-btn:hover {
-    border-color: var(--brown);
-    color: var(--text);
-  }
+.buffer-btn:hover {
+border-color: var(–brown);
+color: var(–text);
+}
 
-  .buffer-btn.active {
-    background: rgba(124,92,191,0.15);
-    border-color: var(--brown-light);
-    color: var(--brown-light);
-    font-weight: 500;
-  }
+.buffer-btn.active {
+background: rgba(124,92,191,0.15);
+border-color: var(–brown-light);
+color: var(–brown-light);
+font-weight: 500;
+}
 
-  .buffer-btn .buf-min {
-    display: block;
-    font-family: 'Syne', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    color: inherit;
-    line-height: 1;
-    margin-bottom: 2px;
-  }
+.buffer-btn .buf-min {
+display: block;
+font-family: ‘Syne’, sans-serif;
+font-size: 18px;
+font-weight: 700;
+color: inherit;
+line-height: 1;
+margin-bottom: 2px;
+}
 
-  .buffer-btn .buf-label {
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    opacity: 0.7;
-  }
+.buffer-btn .buf-label {
+font-size: 9px;
+letter-spacing: 0.1em;
+text-transform: uppercase;
+opacity: 0.7;
+}
 
-  .api-note {
-    font-size: 10px;
-    color: var(--muted);
-    text-align: center;
-    margin-top: 24px;
-    line-height: 1.5;
-    opacity: 0.6;
-  }
+.api-note {
+font-size: 10px;
+color: var(–muted);
+text-align: center;
+margin-top: 24px;
+line-height: 1.5;
+opacity: 0.6;
+}
 </style>
+
 </head>
 <body>
 <div class="app">
@@ -481,6 +483,7 @@
   </div>
 
   <!-- Route Overview -->
+
   <div class="route-card">
     <div class="route-title">Route Overview</div>
     <div class="route-steps">
@@ -510,27 +513,31 @@
       </div>
     </div>
 
-    <!-- Buffer baked into route card -->
-    <div style="border-top: 1px solid var(--border); margin-top: 14px; padding-top: 14px;">
-      <div class="buffer-label" style="margin-bottom:10px;">Arrive early by</div>
-      <div class="buffer-options">
-        <button class="buffer-btn" onclick="setBuffer(10)" id="buf-10">
-          <span class="buf-min">10</span>
-          <span class="buf-label">min</span>
-        </button>
-        <button class="buffer-btn active" onclick="setBuffer(15)" id="buf-15">
-          <span class="buf-min">15</span>
-          <span class="buf-label">min</span>
-        </button>
-        <button class="buffer-btn" onclick="setBuffer(20)" id="buf-20">
-          <span class="buf-min">20</span>
-          <span class="buf-label">min</span>
-        </button>
-      </div>
-    </div>
+```
+<!-- Buffer baked into route card -->
+<div style="border-top: 1px solid var(--border); margin-top: 14px; padding-top: 14px;">
+  <div class="buffer-label" style="margin-bottom:10px;">Arrive early by</div>
+  <div class="buffer-options">
+    <button class="buffer-btn" onclick="setBuffer(10)" id="buf-10">
+      <span class="buf-min">10</span>
+      <span class="buf-label">min</span>
+    </button>
+    <button class="buffer-btn active" onclick="setBuffer(15)" id="buf-15">
+      <span class="buf-min">15</span>
+      <span class="buf-label">min</span>
+    </button>
+    <button class="buffer-btn" onclick="setBuffer(20)" id="buf-20">
+      <span class="buf-min">20</span>
+      <span class="buf-label">min</span>
+    </button>
+  </div>
+</div>
+```
+
   </div>
 
   <!-- Upcoming Trains -->
+
   <div class="section-header">
     <div class="section-title">Upcoming Trains</div>
     <button class="refresh-btn" id="refreshBtn" onclick="fetchTrains()">↻ Refresh</button>
@@ -546,6 +553,7 @@
   <div id="summarySection"></div>
 
   <!-- API Diagnostic Panel -->
+
   <div id="diagPanel" style="display:none; margin-top:20px;">
     <div class="section-header" style="margin-bottom:10px;">
       <div class="section-title" style="font-size:14px;">🔬 API Diagnostic</div>
@@ -625,7 +633,10 @@ async function fetchTrains() {
   btn.classList.add('loading');
   btn.textContent = '↻ Loading…';
 
-  const url = `https://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=${API_KEY}&mapid=${FRANCISCO_MAP_ID}&max=8&outputType=JSON`;
+  // CTA API does not send CORS headers, so we route through a free CORS proxy.
+  // corsproxy.io simply forwards the request and adds the missing CORS header.
+  const ctaUrl = `https://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=${API_KEY}&mapid=${FRANCISCO_MAP_ID}&max=8&outputType=JSON`;
+  const url = `https://corsproxy.io/?url=${encodeURIComponent(ctaUrl)}`;
 
   try {
     const resp = await fetch(url);
@@ -826,7 +837,8 @@ Map ID: ' + FRANCISCO_MAP_ID + '
 
 Sending request...';
 
-  const url = `https://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=${API_KEY}&mapid=${FRANCISCO_MAP_ID}&max=3&outputType=JSON`;
+  const ctaUrl = `https://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=${API_KEY}&mapid=${FRANCISCO_MAP_ID}&max=3&outputType=JSON`;
+  const url = `https://corsproxy.io/?url=${encodeURIComponent(ctaUrl)}`;
 
   try {
     const start = Date.now();
@@ -937,5 +949,6 @@ setInterval(updateClock, 1000);
 fetchTrains();
 setInterval(fetchTrains, 60000);
 </script>
+
 </body>
 </html>
