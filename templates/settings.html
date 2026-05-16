@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Settings — Finance Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Settings</h1>
+</div>
+
+<div class="grid grid-2">
+
+  {# ── Budget Limits ── #}
+  <div class="card">
+    <h2 class="card-title">Monthly Budget Limits</h2>
+    <form method="POST" action="{{ url_for('update_budget') }}">
+      {% for cat in categories %}
+      <div class="form-group">
+        <label>{{ cat }}</label>
+        <div class="input-prefix">
+          <span class="prefix">$</span>
+          <input type="number"
+                 name="limit_{{ cat.replace('/', '_') }}"
+                 value="{{ config.budget_limits.get(cat, 0)|int }}"
+                 min="0" step="10">
+        </div>
+      </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary">Save Limits</button>
+    </form>
+  </div>
+
+  <div>
+    {# ── Add Goal ── #}
+    <div class="card">
+      <h2 class="card-title">Add / Update Savings Goal</h2>
+      <form method="POST" action="{{ url_for('add_goal') }}">
+        <div class="form-group">
+          <label>Goal Name</label>
+          <input type="text" name="name" placeholder="e.g. Emergency Fund" required>
+        </div>
+        <div class="form-group">
+          <label>Target Amount ($)</label>
+          <input type="number" name="target_amount" min="1" step="100" required>
+        </div>
+        <div class="form-group">
+          <label>Current Amount ($)</label>
+          <input type="number" name="current_amount" min="0" step="10" value="0">
+        </div>
+        <button type="submit" class="btn btn-primary">Save Goal</button>
+      </form>
+      <p class="hint">Saving with the same name updates the existing goal.</p>
+    </div>
+
+    {# ── Existing Goals ── #}
+    {% if savings_goals %}
+    <div class="card">
+      <h2 class="card-title">Current Goals</h2>
+      {% for g in savings_goals %}
+      {% set pct = ([((g.current_amount / g.target_amount) * 100), 100]|min) if g.target_amount > 0 else 0 %}
+      <div class="goal-list-row">
+        <div class="goal-info">
+          <div class="goal-name">{{ g.name }}</div>
+          <div class="hint">${{ '%.0f'|format(g.current_amount) }} / ${{ '%.0f'|format(g.target_amount) }} &mdash; {{ '%.0f'|format(pct) }}%</div>
+          <div class="progress-bar" style="margin-top:.4rem">
+            <div class="progress-fill pf-goal" style="width:{{ pct }}%"></div>
+          </div>
+        </div>
+        <form method="POST" action="{{ url_for('delete_goal', goal_id=g.id) }}">
+          <button type="submit" class="btn btn-danger btn-sm"
+                  onclick="return confirm('Delete goal \'{{ g.name }}\'?')">Delete</button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

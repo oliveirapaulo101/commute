@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — Finance Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Dashboard</h1>
+  <span class="subtitle">{{ current_month }}</span>
+  <a href="{{ url_for('upload') }}" class="btn btn-primary ml-auto">+ Import CSV</a>
+</div>
+
+{# ── Budget Alerts ── #}
+{% if alerts %}
+<div class="alert-strip">
+  {% for a in alerts %}
+  <div class="budget-alert budget-alert-{{ a.level }}">
+    {% if a.level == 'danger' %}&#9940;{% else %}&#9888;&#65039;{% endif %}
+    <strong>{{ a.category }}</strong>
+    ${{ '%.0f'|format(a.spent) }} / ${{ '%.0f'|format(a.limit) }}
+    ({{ '%.0f'|format(a.percent) }}%)
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{# ── Charts Row ── #}
+<div class="grid grid-2">
+  <div class="card">
+    <h2 class="card-title">Spending by Category</h2>
+    {% if no_data %}
+      <p class="empty-state">No transactions this month.<br>
+        <a href="{{ url_for('upload') }}">Import a CSV to get started →</a></p>
+    {% else %}
+      <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">6-Month Spending Trend</h2>
+    <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+  </div>
+</div>
+
+{# ── Budget Status ── #}
+<div class="card">
+  <h2 class="card-title">Budget Status — {{ current_month }}</h2>
+  {% if budget_status %}
+  <div class="budget-grid">
+    {% for cat, s in budget_status.items() %}
+    <div class="budget-row">
+      <div class="budget-labels">
+        <span class="cat-name">{{ cat }}</span>
+        <span class="cat-nums">${{ '%.0f'|format(s.spent) }} / ${{ '%.0f'|format(s.limit) }}</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill pf-{{ s.level }}"
+             style="width: {{ [s.percent, 100]|min }}%"></div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="empty-state">Set budget limits in <a href="{{ url_for('settings') }}">Settings</a>.</p>
+  {% endif %}
+</div>
+
+{# ── Savings Goals ── #}
+<div class="card">
+  <div class="card-header-row">
+    <h2 class="card-title">Savings Goals</h2>
+    <a href="{{ url_for('settings') }}" class="btn btn-ghost">Manage →</a>
+  </div>
+  {% if savings_goals %}
+  <div class="goals-grid">
+    {% for g in savings_goals %}
+    {% set pct = ([((g.current_amount / g.target_amount) * 100), 100]|min) if g.target_amount > 0 else 0 %}
+    <div class="goal-card">
+      <div class="goal-row">
+        <span class="goal-name">{{ g.name }}</span>
+        <span class="goal-nums">${{ '%.0f'|format(g.current_amount) }} / ${{ '%.0f'|format(g.target_amount) }}</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill pf-goal" style="width: {{ pct }}%"></div>
+      </div>
+      <div class="goal-pct">{{ '%.0f'|format(pct) }}% complete</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="empty-state">No savings goals yet. <a href="{{ url_for('settings') }}">Add one →</a></p>
+  {% endif %}
+</div>
+
+{# ── Recurring Bills ── #}
+{% if recurring_bills %}
+<div class="card">
+  <h2 class="card-title">Recurring Bills Detected</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>Avg Amount</th>
+        <th>Occurrences (90 days)</th>
+        <th>Last Seen</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in recurring_bills %}
+      <tr>
+        <td>{{ b.description }}</td>
+        <td class="amt-neg">-${{ '%.2f'|format(b.avg_amount|abs) }}</td>
+        <td>{{ b.occurrences }}×</td>
+        <td class="muted">{{ b.last_date }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const PALETTE = [
+  '#6366f1','#f59e0b','#10b981','#ef4444',
+  '#3b82f6','#8b5cf6','#ec4899','#14b8a6'
+];
+
+const chartDefaults = {
+  color: '#94a3b8',
+  plugins: { legend: { labels: { color: '#e2e8f0', font: { size: 12 } } } }
+};
+
+{% if not no_data %}
+new Chart(document.getElementById('donutChart'), {
+  type: 'doughnut',
+  data: {
+    labels:   {{ categories_json|safe }},
+    datasets: [{ data: {{ amounts_json|safe }}, backgroundColor: PALETTE, borderWidth: 0 }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom', labels: { color: '#e2e8f0', font: { size: 12 }, padding: 16 } },
+      tooltip: { callbacks: { label: ctx => ` $${ctx.parsed.toFixed(2)}` } }
+    }
+  }
+});
+{% endif %}
+
+new Chart(document.getElementById('barChart'), {
+  type: 'bar',
+  data: {
+    labels:   {{ trend_labels_json|safe }},
+    datasets: [{
+      label: 'Total Spending',
+      data:  {{ trend_amounts_json|safe }},
+      backgroundColor: '#6366f1',
+      borderRadius: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` $${ctx.parsed.y.toFixed(2)}` } }
+    },
+    scales: {
+      y: {
+        ticks: { color: '#94a3b8', callback: v => `$${v}` },
+        grid:  { color: 'rgba(148,163,184,0.08)' }
+      },
+      x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+    }
+  }
+});
+</script>
+{% endblock %}

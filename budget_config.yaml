@@ -1,0 +1,8 @@
+budget_limits:
+  Food/Dining: 500
+  Shopping: 300
+  Travel: 200
+  Health: 150
+  Entertainment: 100
+  Subscriptions: 80
+  Other: 200

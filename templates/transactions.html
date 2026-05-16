@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Transactions — Finance Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Transactions</h1>
+  <a href="{{ url_for('upload') }}" class="btn btn-primary ml-auto">+ Import CSV</a>
+</div>
+
+<div class="card">
+  {% if transactions %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Description</th>
+        <th>Category</th>
+        <th>Amount</th>
+        <th>Bank</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tx in transactions %}
+      <tr>
+        <td class="muted">{{ tx.date }}</td>
+        <td>{{ tx.description }}</td>
+        <td>
+          <select class="cat-select" data-id="{{ tx.id }}">
+            {% for cat in categories %}
+            <option value="{{ cat }}" {{ 'selected' if tx.category == cat }}>{{ cat }}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td class="{{ 'amt-pos' if tx.amount > 0 else 'amt-neg' }}">
+          {{ '+' if tx.amount > 0 else '' }}${{ '%.2f'|format(tx.amount|abs) }}
+        </td>
+        <td class="muted">{{ tx.source_bank }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="pagination">
+    {% if page > 1 %}
+      <a href="{{ url_for('transactions', page=page-1) }}" class="btn btn-ghost">&larr; Prev</a>
+    {% endif %}
+    <span class="muted">Page {{ page }} of {{ total_pages }}</span>
+    {% if page < total_pages %}
+      <a href="{{ url_for('transactions', page=page+1) }}" class="btn btn-ghost">Next &rarr;</a>
+    {% endif %}
+  </div>
+
+  {% else %}
+  <p class="empty-state">No transactions yet. <a href="{{ url_for('upload') }}">Import a CSV →</a></p>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.querySelectorAll('.cat-select').forEach(sel => {
+  sel.addEventListener('change', async () => {
+    const id  = sel.dataset.id;
+    const cat = sel.value;
+    const res = await fetch(`/api/categorize/${id}`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ category: cat }),
+    });
+    const row = sel.closest('tr');
+    row.style.transition = 'background 0.4s';
+    row.style.background = (await res.json()).ok ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)';
+    setTimeout(() => { row.style.background = ''; }, 1200);
+  });
+});
+</script>
+{% endblock %}
