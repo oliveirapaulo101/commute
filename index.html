@@ -544,10 +544,14 @@ function ctaApiUrl(max) {
 }
 
 async function fetchViaProxies(ctaUrl) {
+  // Cache-buster: proxies (and browsers) cache identical URLs, which
+  // makes every "refresh" return the same stale data. Appending a
+  // timestamp makes each request unique. CTA ignores unknown params.
+  const bustedUrl = ctaUrl + '&_=' + Date.now();
   let lastErr = null;
   for (const wrap of PROXIES) {
     try {
-      const resp = await fetch(wrap(ctaUrl));
+      const resp = await fetch(wrap(bustedUrl), { cache: 'no-store' });
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
       return await resp.text();
     } catch (e) {
@@ -727,6 +731,12 @@ function renderTrainItems(items, isDemo) {
       '</div>' +
     '</div>';
   }).join('');
+
+  // Keep the selected train highlighted across re-renders
+  if (selectedTrain !== null) {
+    const sel = document.getElementById('train-' + selectedTrain);
+    if (sel) sel.classList.add('selected');
+  }
 }
 
 function selectTrain(idx) {
@@ -871,6 +881,22 @@ updateClock();
 setInterval(updateClock, 1000);
 fetchTrains();
 setInterval(fetchTrains, 60000);
+
+// Tick the countdowns locally between API fetches so "mins away"
+// and LEAVE labels stay accurate even if a fetch is slow or fails.
+setInterval(function() {
+  if (lastItems && !isDemoMode) renderTrainItems(lastItems, false);
+}, 20000);
+
+// Phone browsers pause timers when the app is backgrounded, so the
+// data goes stale. Refetch immediately whenever the app comes back
+// to the foreground or is restored from the back/forward cache.
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'visible') fetchTrains();
+});
+window.addEventListener('pageshow', function(e) {
+  if (e.persisted) fetchTrains();
+});
 </script>
 </body>
 </html>
