@@ -528,8 +528,11 @@ const TRAIN_RIDE = 30;       // approx minutes, Damen -> Quincy
 // CTA's API doesn't send CORS headers, so requests go through a
 // proxy. If the first proxy fails, the second is tried automatically.
 const PROXIES = [
-  (url) => 'https://corsproxy.io/?url=' + encodeURIComponent(url),
-  (url) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url)
+  // Cache-buster (&_=timestamp) goes on the PROXY url, not the CTA
+  // url — CTA rejects unknown parameters with error 500. The proxy
+  // ignores the extra param but caches see a unique URL each time.
+  (url) => 'https://corsproxy.io/?url=' + encodeURIComponent(url) + '&_=' + Date.now(),
+  (url) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url) + '&_=' + Date.now()
 ];
 // ============================================================
 
