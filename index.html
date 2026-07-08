@@ -528,11 +528,11 @@ const TRAIN_RIDE = 30;       // approx minutes, Damen -> Quincy
 // CTA's API doesn't send CORS headers, so requests go through a
 // proxy. If the first proxy fails, the second is tried automatically.
 const PROXIES = [
-  // Cache-buster (&_=timestamp) goes on the PROXY url, not the CTA
-  // url — CTA rejects unknown parameters with error 500. The proxy
-  // ignores the extra param but caches see a unique URL each time.
-  (url) => 'https://corsproxy.io/?url=' + encodeURIComponent(url) + '&_=' + Date.now(),
-  (url) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url) + '&_=' + Date.now()
+  // NOTE: do not append extra query params here — corsproxy.io
+  // forwards anything after ?url= to the target, and CTA rejects
+  // unknown parameters with error 500.
+  (url) => 'https://corsproxy.io/?url=' + encodeURIComponent(url),
+  (url) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url)
 ];
 // ============================================================
 
@@ -547,14 +547,10 @@ function ctaApiUrl(max) {
 }
 
 async function fetchViaProxies(ctaUrl) {
-  // Cache-buster: proxies (and browsers) cache identical URLs, which
-  // makes every "refresh" return the same stale data. Appending a
-  // timestamp makes each request unique. CTA ignores unknown params.
-  const bustedUrl = ctaUrl + '&_=' + Date.now();
   let lastErr = null;
   for (const wrap of PROXIES) {
     try {
-      const resp = await fetch(wrap(bustedUrl), { cache: 'no-store' });
+      const resp = await fetch(wrap(ctaUrl), { cache: 'no-store' });
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
       return await resp.text();
     } catch (e) {
@@ -625,10 +621,11 @@ async function fetchTrains() {
     const root = data && data.ctatt;
     if (!root) throw new Error('No ctatt in response: ' + raw.substring(0, 200));
 
-    // errCd can be string "0" or integer 0 — coerce to string
-    const errCd = String((root.errCd && root.errCd[0]) || root.errCd || '0');
+    // errCd may be a string, number, or array depending on response.
+    // Never index a string directly ("500"[0] === "5").
+    const errCd = String(Array.isArray(root.errCd) ? root.errCd[0] : (root.errCd != null ? root.errCd : '0'));
     if (errCd !== '0') {
-      const errNm = (root.errNm && root.errNm[0]) || root.errNm || 'Unknown CTA error';
+      const errNm = Array.isArray(root.errNm) ? root.errNm[0] : (root.errNm || 'Unknown CTA error');
       throw new Error('CTA API error ' + errCd + ': ' + errNm);
     }
 
@@ -827,8 +824,10 @@ async function runDiag() {
     }
 
     const root = data && data.ctatt;
-    const errCd = String((root && root.errCd && root.errCd[0]) || (root && root.errCd) || '0');
-    const errNm = (root && root.errNm && root.errNm[0]) || (root && root.errNm) || '';
+    const rawCd = root ? root.errCd : null;
+    const rawNm = root ? root.errNm : null;
+    const errCd = String(Array.isArray(rawCd) ? rawCd[0] : (rawCd != null ? rawCd : '0'));
+    const errNm = String(Array.isArray(rawNm) ? rawNm[0] : (rawNm || ''));
 
     if (errCd !== '0') {
       box.style.color = '#f5a623';
