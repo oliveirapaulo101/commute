@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -20,458 +19,403 @@
     --red: #f87171;
   }
 
-- { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-body {
-background: var(–bg);
-color: var(–text);
-font-family: ‘DM Mono’, monospace;
-min-height: 100vh;
-padding: 0;
-overflow-x: hidden;
-}
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    padding: 0;
+    overflow-x: hidden;
+  }
 
-/* Animated grid background */
-body::before {
-content: ‘’;
-position: fixed;
-inset: 0;
-background-image:
-linear-gradient(rgba(124,92,191,0.04) 1px, transparent 1px),
-linear-gradient(90deg, rgba(124,92,191,0.04) 1px, transparent 1px);
-background-size: 40px 40px;
-pointer-events: none;
-z-index: 0;
-}
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,92,191,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,92,191,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-.app {
-position: relative;
-z-index: 1;
-max-width: 420px;
-margin: 0 auto;
-padding: 24px 20px 40px;
-}
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 24px 20px 40px;
+  }
 
-/* Header */
-.header {
-margin-bottom: 32px;
-}
+  /* Header */
+  .header { margin-bottom: 32px; }
 
-.header-label {
-font-size: 10px;
-letter-spacing: 0.25em;
-color: var(–brown-light);
-text-transform: uppercase;
-margin-bottom: 4px;
-}
+  .header-label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--brown-light);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
 
-.header h1 {
-font-family: ‘Syne’, sans-serif;
-font-size: 28px;
-font-weight: 800;
-letter-spacing: -0.02em;
-line-height: 1.1;
-}
+  .header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
 
-.header h1 span {
-color: var(–accent);
-}
+  .header h1 span { color: var(--accent); }
 
-.current-time {
-font-size: 11px;
-color: var(–muted);
-margin-top: 6px;
-}
+  .current-time {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
 
-/* Route card */
-.route-card {
-background: var(–surface);
-border: 1px solid var(–border);
-border-radius: 16px;
-padding: 20px;
-margin-bottom: 20px;
-}
+  /* Route card */
+  .route-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
 
-.route-title {
-font-size: 10px;
-letter-spacing: 0.2em;
-text-transform: uppercase;
-color: var(–muted);
-margin-bottom: 16px;
-}
+  .route-title {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
 
-.route-steps {
-display: flex;
-flex-direction: column;
-gap: 0;
-}
+  .route-steps { display: flex; flex-direction: column; gap: 0; }
 
-.step {
-display: flex;
-align-items: flex-start;
-gap: 14px;
-padding: 10px 0;
-position: relative;
-}
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 10px 0;
+    position: relative;
+  }
 
-.step:not(:last-child)::after {
-content: ‘’;
-position: absolute;
-left: 11px;
-top: 32px;
-bottom: -10px;
-width: 1px;
-background: var(–border);
-}
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 32px;
+    bottom: -10px;
+    width: 1px;
+    background: var(--border);
+  }
 
-.step-dot {
-width: 23px;
-height: 23px;
-border-radius: 50%;
-flex-shrink: 0;
-display: flex;
-align-items: center;
-justify-content: center;
-font-size: 10px;
-font-weight: 500;
-margin-top: 1px;
-}
+  .step-dot {
+    width: 23px;
+    height: 23px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 500;
+    margin-top: 1px;
+  }
 
-.step-dot.walk { background: var(–border); color: var(–muted); }
-.step-dot.train { background: var(–brown); color: white; font-size: 9px; }
-.step-dot.dest { background: var(–accent); color: #000; }
+  .step-dot.walk { background: var(--border); color: var(--muted); }
+  .step-dot.train { background: var(--brown); color: white; font-size: 9px; }
+  .step-dot.dest { background: var(--accent); color: #000; }
 
-.step-info { flex: 1; }
-.step-name { font-size: 13px; font-weight: 500; color: var(–text); }
-.step-detail { font-size: 11px; color: var(–muted); margin-top: 2px; }
+  .step-info { flex: 1; }
+  .step-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .step-detail { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
-.step-time {
-font-size: 11px;
-color: var(–brown-light);
-font-weight: 500;
-white-space: nowrap;
-margin-top: 2px;
-}
+  .step-time {
+    font-size: 11px;
+    color: var(--brown-light);
+    font-weight: 500;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
 
-/* Trains section */
-.section-header {
-display: flex;
-align-items: center;
-justify-content: space-between;
-margin-bottom: 14px;
-}
+  /* Trains section */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
 
-.section-title {
-font-family: ‘Syne’, sans-serif;
-font-size: 16px;
-font-weight: 700;
-}
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+  }
 
-.refresh-btn {
-background: var(–surface);
-border: 1px solid var(–border);
-color: var(–brown-light);
-padding: 6px 12px;
-border-radius: 8px;
-font-family: ‘DM Mono’, monospace;
-font-size: 11px;
-cursor: pointer;
-transition: all 0.2s;
-}
+  .refresh-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--brown-light);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
 
-.refresh-btn:hover {
-border-color: var(–brown);
-color: var(–brown-light);
-background: rgba(124,92,191,0.1);
-}
+  .refresh-btn:hover {
+    border-color: var(--brown);
+    color: var(--brown-light);
+    background: rgba(124,92,191,0.1);
+  }
 
-.refresh-btn.loading {
-opacity: 0.5;
-pointer-events: none;
-}
+  .refresh-btn.loading { opacity: 0.5; pointer-events: none; }
 
-/* Train items */
-.trains-list {
-display: flex;
-flex-direction: column;
-gap: 10px;
-}
+  /* Train items */
+  .trains-list { display: flex; flex-direction: column; gap: 10px; }
 
-.train-item {
-background: var(–surface);
-border: 1px solid var(–border);
-border-radius: 12px;
-padding: 16px;
-cursor: pointer;
-transition: all 0.2s;
-position: relative;
-overflow: hidden;
-}
+  .train-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
 
-.train-item::before {
-content: ‘’;
-position: absolute;
-left: 0;
-top: 0;
-bottom: 0;
-width: 3px;
-background: var(–brown);
-border-radius: 3px 0 0 3px;
-opacity: 0;
-transition: opacity 0.2s;
-}
+  .train-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--brown);
+    border-radius: 3px 0 0 3px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
 
-.train-item:hover, .train-item.selected {
-border-color: var(–brown);
-background: rgba(124,92,191,0.08);
-}
+  .train-item:hover, .train-item.selected {
+    border-color: var(--brown);
+    background: rgba(124,92,191,0.08);
+  }
 
-.train-item:hover::before, .train-item.selected::before {
-opacity: 1;
-}
+  .train-item:hover::before, .train-item.selected::before { opacity: 1; }
 
-.train-item.selected {
-border-color: var(–brown-light);
-}
+  .train-item.selected { border-color: var(--brown-light); }
 
-.train-top {
-display: flex;
-align-items: center;
-justify-content: space-between;
-margin-bottom: 8px;
-}
+  .train-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
 
-.train-route {
-display: flex;
-align-items: center;
-gap: 8px;
-}
+  .train-route { display: flex; align-items: center; gap: 8px; }
 
-.line-badge {
-background: var(–brown);
-color: white;
-font-size: 9px;
-font-weight: 500;
-letter-spacing: 0.1em;
-padding: 2px 7px;
-border-radius: 4px;
-text-transform: uppercase;
-}
+  .line-badge {
+    background: var(--brown);
+    color: white;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    padding: 2px 7px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
 
-.train-dest {
-font-size: 12px;
-color: var(–muted);
-}
+  .train-dest { font-size: 12px; color: var(--muted); }
 
-.train-arr {
-font-family: ‘Syne’, sans-serif;
-font-size: 22px;
-font-weight: 700;
-color: var(–text);
-}
+  .train-arr {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
 
-.train-arr.soon { color: var(–accent); }
-.train-arr.now { color: var(–green); }
+  .train-arr.soon { color: var(--accent); }
+  .train-arr.now { color: var(--green); }
 
-.train-mins-label {
-font-size: 10px;
-color: var(–muted);
-text-align: right;
-}
+  .train-mins-label { font-size: 10px; color: var(--muted); text-align: right; }
 
-.train-bottom {
-display: flex;
-align-items: center;
-justify-content: space-between;
-}
+  .train-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 
-.train-depart {
-font-size: 11px;
-color: var(–muted);
-}
+  .train-depart { font-size: 11px; color: var(--muted); }
+  .depart-highlight { color: var(--text); }
 
-.depart-highlight {
-color: var(–text);
-}
+  .feasibility {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
 
-.feasibility {
-font-size: 10px;
-padding: 3px 8px;
-border-radius: 20px;
-font-weight: 500;
-letter-spacing: 0.05em;
-}
+  .feas-yes {
+    background: rgba(74,222,128,0.12);
+    color: var(--green);
+    border: 1px solid rgba(74,222,128,0.2);
+  }
 
-.feas-yes {
-background: rgba(74,222,128,0.12);
-color: var(–green);
-border: 1px solid rgba(74,222,128,0.2);
-}
+  .feas-tight {
+    background: rgba(245,166,35,0.12);
+    color: var(--accent);
+    border: 1px solid rgba(245,166,35,0.2);
+  }
 
-.feas-tight {
-background: rgba(245,166,35,0.12);
-color: var(–accent);
-border: 1px solid rgba(245,166,35,0.2);
-}
+  .feas-no {
+    background: rgba(248,113,113,0.1);
+    color: var(--red);
+    border: 1px solid rgba(248,113,113,0.2);
+  }
 
-.feas-no {
-background: rgba(248,113,113,0.1);
-color: var(–red);
-border: 1px solid rgba(248,113,113,0.2);
-}
+  /* Selected summary */
+  .summary-card {
+    background: rgba(124,92,191,0.1);
+    border: 1px solid var(--brown);
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
+    animation: fadeUp 0.3s ease;
+  }
 
-/* Selected summary */
-.summary-card {
-background: rgba(124,92,191,0.1);
-border: 1px solid var(–brown);
-border-radius: 16px;
-padding: 20px;
-margin-top: 20px;
-animation: fadeUp 0.3s ease;
-}
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-@keyframes fadeUp {
-from { opacity: 0; transform: translateY(10px); }
-to { opacity: 1; transform: translateY(0); }
-}
+  .summary-title {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--brown-light);
+    margin-bottom: 14px;
+  }
 
-.summary-title {
-font-size: 10px;
-letter-spacing: 0.2em;
-text-transform: uppercase;
-color: var(–brown-light);
-margin-bottom: 14px;
-}
+  .summary-timeline { display: flex; flex-direction: column; gap: 8px; }
 
-.summary-timeline {
-display: flex;
-flex-direction: column;
-gap: 8px;
-}
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(30,30,46,0.8);
+  }
 
-.summary-row {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 6px 0;
-border-bottom: 1px solid rgba(30,30,46,0.8);
-}
+  .summary-row:last-child { border-bottom: none; }
 
-.summary-row:last-child { border-bottom: none; }
+  .summary-label { font-size: 11px; color: var(--muted); }
+  .summary-value { font-size: 12px; color: var(--text); font-weight: 500; }
+  .summary-value.arrival { color: var(--accent); font-family: 'Syne', sans-serif; font-size: 18px; }
 
-.summary-label { font-size: 11px; color: var(–muted); }
-.summary-value { font-size: 12px; color: var(–text); font-weight: 500; }
-.summary-value.arrival { color: var(–accent); font-family: ‘Syne’, sans-serif; font-size: 18px; }
+  /* Status messages */
+  .status-msg {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
+  }
 
-/* Status messages */
-.status-msg {
-text-align: center;
-padding: 40px 20px;
-color: var(–muted);
-font-size: 12px;
-line-height: 1.6;
-}
+  .status-msg .icon { font-size: 28px; display: block; margin-bottom: 10px; }
 
-.status-msg .icon {
-font-size: 28px;
-display: block;
-margin-bottom: 10px;
-}
+  .error-msg {
+    color: var(--red);
+    background: rgba(248,113,113,0.08);
+    border: 1px solid rgba(248,113,113,0.2);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
 
-.error-msg {
-color: var(–red);
-background: rgba(248,113,113,0.08);
-border: 1px solid rgba(248,113,113,0.2);
-border-radius: 10px;
-padding: 14px;
-font-size: 12px;
-line-height: 1.5;
-}
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--brown-light);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
 
-.spinner {
-display: inline-block;
-width: 16px; height: 16px;
-border: 2px solid var(–border);
-border-top-color: var(–brown-light);
-border-radius: 50%;
-animation: spin 0.7s linear infinite;
-vertical-align: middle;
-margin-right: 6px;
-}
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+  /* Buffer selector */
+  .buffer-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
 
-/* Buffer selector */
-.buffer-section {
-margin-bottom: 20px;
-}
+  .buffer-options { display: flex; gap: 8px; }
 
-.buffer-label {
-font-size: 10px;
-letter-spacing: 0.2em;
-text-transform: uppercase;
-color: var(–muted);
-margin-bottom: 10px;
-}
+  .buffer-btn {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 10px 0;
+    border-radius: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
 
-.buffer-options {
-display: flex;
-gap: 8px;
-}
+  .buffer-btn:hover { border-color: var(--brown); color: var(--text); }
 
-.buffer-btn {
-flex: 1;
-background: var(–surface);
-border: 1px solid var(–border);
-color: var(–muted);
-padding: 10px 0;
-border-radius: 10px;
-font-family: ‘DM Mono’, monospace;
-font-size: 13px;
-cursor: pointer;
-transition: all 0.2s;
-text-align: center;
-}
+  .buffer-btn.active {
+    background: rgba(124,92,191,0.15);
+    border-color: var(--brown-light);
+    color: var(--brown-light);
+    font-weight: 500;
+  }
 
-.buffer-btn:hover {
-border-color: var(–brown);
-color: var(–text);
-}
+  .buffer-btn .buf-min {
+    display: block;
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: inherit;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
 
-.buffer-btn.active {
-background: rgba(124,92,191,0.15);
-border-color: var(–brown-light);
-color: var(–brown-light);
-font-weight: 500;
-}
+  .buffer-btn .buf-label {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
 
-.buffer-btn .buf-min {
-display: block;
-font-family: ‘Syne’, sans-serif;
-font-size: 18px;
-font-weight: 700;
-color: inherit;
-line-height: 1;
-margin-bottom: 2px;
-}
-
-.buffer-btn .buf-label {
-font-size: 9px;
-letter-spacing: 0.1em;
-text-transform: uppercase;
-opacity: 0.7;
-}
-
-.api-note {
-font-size: 10px;
-color: var(–muted);
-text-align: center;
-margin-top: 24px;
-line-height: 1.5;
-opacity: 0.6;
-}
+  .api-note {
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 24px;
+    line-height: 1.5;
+    opacity: 0.6;
+  }
 </style>
-
 </head>
 <body>
 <div class="app">
@@ -483,28 +427,27 @@ opacity: 0.6;
   </div>
 
   <!-- Route Overview -->
-
   <div class="route-card">
     <div class="route-title">Route Overview</div>
     <div class="route-steps">
       <div class="step">
-        <div class="step-dot walk">🚶</div>
+        <div class="step-dot walk">&#128694;</div>
         <div class="step-info">
-          <div class="step-name">Walk to Francisco</div>
-          <div class="step-detail">Brown Line · Loop-bound</div>
+          <div class="step-name">Walk to Damen</div>
+          <div class="step-detail">Brown Line &middot; Loop-bound</div>
         </div>
-        <div class="step-time">10 min</div>
+        <div class="step-time" id="walkTime1">10 min</div>
       </div>
       <div class="step">
         <div class="step-dot train">BRN</div>
         <div class="step-info">
-          <div class="step-name">Francisco → Quincy</div>
-          <div class="step-detail">~35 min ride</div>
+          <div class="step-name">Damen &rarr; Quincy</div>
+          <div class="step-detail">~30 min ride</div>
         </div>
         <div class="step-time">varies</div>
       </div>
       <div class="step">
-        <div class="step-dot dest">★</div>
+        <div class="step-dot dest">&#9733;</div>
         <div class="step-info">
           <div class="step-name">Options Clearing Corp</div>
           <div class="step-detail">Walk from Quincy</div>
@@ -513,84 +456,114 @@ opacity: 0.6;
       </div>
     </div>
 
-```
-<!-- Buffer baked into route card -->
-<div style="border-top: 1px solid var(--border); margin-top: 14px; padding-top: 14px;">
-  <div class="buffer-label" style="margin-bottom:10px;">Arrive early by</div>
-  <div class="buffer-options">
-    <button class="buffer-btn" onclick="setBuffer(10)" id="buf-10">
-      <span class="buf-min">10</span>
-      <span class="buf-label">min</span>
-    </button>
-    <button class="buffer-btn active" onclick="setBuffer(15)" id="buf-15">
-      <span class="buf-min">15</span>
-      <span class="buf-label">min</span>
-    </button>
-    <button class="buffer-btn" onclick="setBuffer(20)" id="buf-20">
-      <span class="buf-min">20</span>
-      <span class="buf-label">min</span>
-    </button>
-  </div>
-</div>
-```
-
+    <!-- Buffer baked into route card -->
+    <div style="border-top: 1px solid var(--border); margin-top: 14px; padding-top: 14px;">
+      <div class="buffer-label" style="margin-bottom:10px;">Safety buffer at station</div>
+      <div class="buffer-options">
+        <button class="buffer-btn" onclick="setBuffer(5)" id="buf-5">
+          <span class="buf-min">5</span>
+          <span class="buf-label">min</span>
+        </button>
+        <button class="buffer-btn active" onclick="setBuffer(10)" id="buf-10">
+          <span class="buf-min">10</span>
+          <span class="buf-label">min</span>
+        </button>
+        <button class="buffer-btn" onclick="setBuffer(15)" id="buf-15">
+          <span class="buf-min">15</span>
+          <span class="buf-label">min</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Upcoming Trains -->
-
   <div class="section-header">
     <div class="section-title">Upcoming Trains</div>
-    <button class="refresh-btn" id="refreshBtn" onclick="fetchTrains()">↻ Refresh</button>
+    <button class="refresh-btn" id="refreshBtn" onclick="fetchTrains()">&#8635; Refresh</button>
   </div>
 
   <div class="trains-list" id="trainsList">
     <div class="status-msg">
-      <span class="icon">🚂</span>
-      Loading arrivals at Francisco...
+      <span class="icon">&#128642;</span>
+      Loading arrivals at Damen...
     </div>
   </div>
 
   <div id="summarySection"></div>
 
   <!-- API Diagnostic Panel -->
-
   <div id="diagPanel" style="display:none; margin-top:20px;">
     <div class="section-header" style="margin-bottom:10px;">
-      <div class="section-title" style="font-size:14px;">🔬 API Diagnostic</div>
-      <button class="refresh-btn" onclick="hideDiag()" style="font-size:10px;">✕ Close</button>
+      <div class="section-title" style="font-size:14px;">&#128300; API Diagnostic</div>
+      <button class="refresh-btn" onclick="hideDiag()" style="font-size:10px;">&#10005; Close</button>
     </div>
     <div id="diagContent" style="background:#0a0a0f;border:1px solid #1e1e2e;border-radius:10px;padding:14px;font-size:11px;color:#a8d8a8;font-family:monospace;white-space:pre-wrap;word-break:break-all;line-height:1.6;max-height:300px;overflow-y:auto;">Running test...</div>
   </div>
 
   <div class="api-note">
-    Live CTA data · Francisco Station (Brown Line)<br>
+    Live CTA data &middot; Damen Station (Brown Line, Loop-bound)<br>
     10 min walk + train + 5 min walk to OCC<br><br>
-    <span onclick="runDiag()" style="color:var(--brown-light);cursor:pointer;text-decoration:underline;">🔬 Test API connection</span>
+    <span onclick="runDiag()" style="color:var(--brown-light);cursor:pointer;text-decoration:underline;">&#128300; Test API connection</span>
   </div>
 
 </div>
 
 <script>
+// ============================================================
+// CONFIG — edit these if your timings change
+// ============================================================
 const API_KEY = 'fd3f8a638792464abd6f64d6b929ff9c';
-// Francisco Brown Line stop ID (Loop-bound / toward downtown)
-const FRANCISCO_MAP_ID = '41800'; // Francisco station map ID (Brown Line)
-const WALK_TO_STATION = 10; // minutes
-const WALK_FROM_QUINCY = 5; // minutes
-const TRAIN_RIDE = 35; // approximate minutes Francisco to Quincy
+
+// Damen (Brown Line), Loop-bound platform.
+// Using the platform-level stop ID (stpid) instead of the station
+// ID (mapid) means the API only returns Loop-bound trains — no
+// Kimball-bound trains to filter out.
+// Reference: Damen station mapid = 40090, Loop-bound stpid = 30018
+const STOP_ID = '30018';
+
+const WALK_TO_STATION = 10;  // minutes, home -> Damen
+const WALK_FROM_QUINCY = 5;  // minutes, Quincy -> OCC
+const TRAIN_RIDE = 30;       // approx minutes, Damen -> Quincy
+
+// CTA's API doesn't send CORS headers, so requests go through a
+// proxy. If the first proxy fails, the second is tried automatically.
+const PROXIES = [
+  (url) => 'https://corsproxy.io/?url=' + encodeURIComponent(url),
+  (url) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url)
+];
+// ============================================================
 
 let selectedTrain = null;
-let bufferMins = 15; // default buffer
-window._lastEtas = null;
-window._isDemo = false;
+let bufferMins = 10; // default buffer
+let lastItems = null;
+let isDemoMode = false;
+
+function ctaApiUrl(max) {
+  return 'https://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=' +
+    API_KEY + '&stpid=' + STOP_ID + '&max=' + max + '&outputType=JSON';
+}
+
+async function fetchViaProxies(ctaUrl) {
+  let lastErr = null;
+  for (const wrap of PROXIES) {
+    try {
+      const resp = await fetch(wrap(ctaUrl));
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      return await resp.text();
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr || new Error('All proxies failed');
+}
 
 function setBuffer(mins) {
   bufferMins = mins;
-  [10, 15, 20].forEach(b => {
-    document.getElementById(`buf-${b}`)?.classList.toggle('active', b === mins);
+  [5, 10, 15].forEach(function(b) {
+    var el = document.getElementById('buf-' + b);
+    if (el) el.classList.toggle('active', b === mins);
   });
-  // Re-render with new buffer if data is cached
-  if (window._lastEtas) renderTrainItems(window._lastEtas, window._isDemo);
-  // Clear summary since timing changed
+  if (lastItems) renderTrainItems(lastItems, isDemoMode);
   document.getElementById('summarySection').innerHTML = '';
   selectedTrain = null;
 }
@@ -606,23 +579,22 @@ function fmtTime(date) {
 }
 
 function parseCTATime(str) {
-  // CTA format: "20250225 14:30:00" — 8 date chars, space, HH:MM:SS
-  // Also handle ISO format just in case
+  // CTA format: "20260707 08:30:00" (YYYYMMDD HH:MM:SS)
   if (!str) return new Date(NaN);
   try {
-    // Standard CTA format: YYYYMMDD HH:MM:SS
     if (/^\d{8} \d{2}:\d{2}:\d{2}$/.test(str.trim())) {
-      const yr = parseInt(str.substring(0, 4));
-      const mo = parseInt(str.substring(4, 6)) - 1;
-      const dy = parseInt(str.substring(6, 8));
-      const hr = parseInt(str.substring(9, 11));
-      const mn = parseInt(str.substring(12, 14));
-      const sc = parseInt(str.substring(15, 17));
-      return new Date(yr, mo, dy, hr, mn, sc);
+      const s = str.trim();
+      return new Date(
+        parseInt(s.substring(0, 4)),
+        parseInt(s.substring(4, 6)) - 1,
+        parseInt(s.substring(6, 8)),
+        parseInt(s.substring(9, 11)),
+        parseInt(s.substring(12, 14)),
+        parseInt(s.substring(15, 17))
+      );
     }
-    // Fallback: try native Date parse
     return new Date(str);
-  } catch(e) {
+  } catch (e) {
     return new Date(NaN);
   }
 }
@@ -631,87 +603,82 @@ async function fetchTrains() {
   const btn = document.getElementById('refreshBtn');
   const list = document.getElementById('trainsList');
   btn.classList.add('loading');
-  btn.textContent = '↻ Loading…';
-
-  // CTA API does not send CORS headers, so we route through a free CORS proxy.
-  // corsproxy.io simply forwards the request and adds the missing CORS header.
-  const ctaUrl = `https://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=${API_KEY}&mapid=${FRANCISCO_MAP_ID}&max=8&outputType=JSON`;
-  const url = `https://corsproxy.io/?url=${encodeURIComponent(ctaUrl)}`;
+  btn.innerHTML = '&#8635; Loading\u2026';
 
   try {
-    const resp = await fetch(url);
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const raw = await fetchViaProxies(ctaApiUrl(8));
 
-    const raw = await resp.text();
     let data;
     try {
       data = JSON.parse(raw);
-    } catch(e) {
+    } catch (e) {
       throw new Error('CTA returned invalid JSON: ' + raw.substring(0, 100));
     }
 
-    const root = data?.ctatt;
+    const root = data && data.ctatt;
     if (!root) throw new Error('No ctatt in response: ' + raw.substring(0, 200));
 
-    // errCd can be string "0" or integer 0 — coerce to string for comparison
-    const errCd = String(root.errCd?.[0] ?? root.errCd ?? '0');
+    // errCd can be string "0" or integer 0 — coerce to string
+    const errCd = String((root.errCd && root.errCd[0]) || root.errCd || '0');
     if (errCd !== '0') {
-      const errNm = root.errNm?.[0] || root.errNm || 'Unknown CTA error';
-      throw new Error(`CTA API error ${errCd}: ${errNm}`);
+      const errNm = (root.errNm && root.errNm[0]) || root.errNm || 'Unknown CTA error';
+      throw new Error('CTA API error ' + errCd + ': ' + errNm);
     }
 
     let etas = root.eta;
     if (!etas || (Array.isArray(etas) && etas.length === 0)) {
-      list.innerHTML = `<div class="status-msg"><span class="icon">😴</span>No upcoming trains found.<br>Service may have ended for the night.</div>`;
+      list.innerHTML = '<div class="status-msg"><span class="icon">&#128564;</span>No upcoming trains found.<br>Service may have ended for the night.</div>';
       return;
     }
     if (!Array.isArray(etas)) etas = [etas];
 
-    // mapid returns all lines at the station — filter Brown Line only
-    const brn = etas.filter(e => e.rt === 'Brn' || e.rt === 'Brown');
-    const useEtas = brn.length > 0 ? brn : etas; // fallback: show all if filter returns nothing
-
-    renderTrains(useEtas);
+    renderTrains(etas);
   } catch (err) {
     console.error('fetchTrains error:', err);
-    list.innerHTML = `<div class="error-msg" style="margin-bottom:12px">⚠️ ${err.message}<br><small style="opacity:0.6;display:block;margin-top:4px;">Tap 🔬 Test API connection below for details. Showing demo times.</small></div>`;
+    list.innerHTML = '<div class="error-msg" style="margin-bottom:12px">&#9888;&#65039; ' + err.message +
+      '<br><small style="opacity:0.6;display:block;margin-top:4px;">Tap Test API connection below for details. Showing demo times.</small></div>';
     renderDemoTrains();
   } finally {
     btn.classList.remove('loading');
-    btn.textContent = '↻ Refresh';
+    btn.innerHTML = '&#8635; Refresh';
   }
 }
 
 function renderDemoTrains() {
   const now = new Date();
-  const items = [5, 12, 22, 35, 48].map((mins, i) => ({
-    arrT: new Date(now.getTime() + mins * 60000),
-    destNm: 'Loop',
-    isApp: mins <= 1,
-    isSch: i % 3 === 0
-  }));
-  window._lastEtas = items;
-  window._isDemo = true;
+  const items = [5, 12, 22, 35, 48].map(function(mins, i) {
+    return {
+      arrT: new Date(now.getTime() + mins * 60000),
+      destNm: 'Loop',
+      isApp: mins <= 1,
+      isSch: i % 3 === 0
+    };
+  });
+  lastItems = items;
+  isDemoMode = true;
   renderTrainItems(items, true);
 }
 
 function renderTrains(etas) {
-  const items = etas.map(e => ({
-    arrT: parseCTATime(e.arrT),
-    destNm: e.destNm || 'Loop',
-    isApp: e.isApp === '1',
-    isSch: e.isSch === '1'
-  })).filter(e => e.arrT instanceof Date && !isNaN(e.arrT))
-     .sort((a, b) => a.arrT - b.arrT);
+  const items = etas.map(function(e) {
+    return {
+      arrT: parseCTATime(e.arrT),
+      destNm: e.destNm || 'Loop',
+      isApp: e.isApp === '1',
+      isSch: e.isSch === '1'
+    };
+  }).filter(function(e) {
+    return e.arrT instanceof Date && !isNaN(e.arrT);
+  }).sort(function(a, b) { return a.arrT - b.arrT; });
 
   if (items.length === 0) {
     document.getElementById('trainsList').innerHTML =
-      `<div class="status-msg"><span class="icon">🚂</span>No valid arrivals parsed.<br>Tap 🔬 Test API connection to debug.</div>`;
+      '<div class="status-msg"><span class="icon">&#128642;</span>No valid arrivals parsed.<br>Tap Test API connection to debug.</div>';
     return;
   }
 
-  window._lastEtas = items;
-  window._isDemo = false;
+  lastItems = items;
+  isDemoMode = false;
   renderTrainItems(items, false);
 }
 
@@ -720,65 +687,60 @@ function renderTrainItems(items, isDemo) {
   const now = new Date();
 
   const demoNote = isDemo
-    ? `<div class="error-msg" style="margin-bottom:12px;font-size:11px;">⚠️ <strong>Demo mode</strong> — times are illustrative. Host on GitHub Pages for live CTA data.</div>`
+    ? '<div class="error-msg" style="margin-bottom:12px;font-size:11px;">&#9888;&#65039; <strong>Demo mode</strong> — times are illustrative, not live.</div>'
     : '';
 
-  list.innerHTML = demoNote + items.map((t, i) => {
+  list.innerHTML = demoNote + items.map(function(t, i) {
     const minsToTrain = Math.round((t.arrT - now) / 60000);
-    const minsDisplay = minsToTrain <= 0 ? 'DUE' : `${minsToTrain}`;
+    const minsDisplay = minsToTrain <= 0 ? 'DUE' : String(minsToTrain);
     const minsLabel = minsToTrain <= 0 ? 'arriving now' : minsToTrain === 1 ? 'min away' : 'mins away';
     const arrClass = minsToTrain <= 1 ? 'now' : minsToTrain <= 5 ? 'soon' : '';
 
-    // Buffer baked in: leave home = train arrival - walk - buffer
-    // This means the "leave home" time is already early enough to arrive bufferMins before the train
+    // Leave home = train arrival - walk - buffer, so you reach the
+    // platform with bufferMins to spare before the train arrives.
     const leaveAt = new Date(t.arrT.getTime() - WALK_TO_STATION * 60000 - bufferMins * 60000);
-    const arriveOCC = new Date(t.arrT.getTime() + TRAIN_RIDE * 60000 + WALK_FROM_QUINCY * 60000);
     const leaveInMins = Math.round((leaveAt - now) / 60000);
 
     let feasClass, feasLabel;
     if (leaveInMins < -2) {
       feasClass = 'feas-no'; feasLabel = 'MISSED';
     } else if (leaveInMins <= 2) {
-      feasClass = 'feas-tight'; feasLabel = leaveInMins <= 0 ? 'LEAVE NOW' : `GO IN ${leaveInMins}m`;
+      feasClass = 'feas-tight'; feasLabel = leaveInMins <= 0 ? 'LEAVE NOW' : 'GO IN ' + leaveInMins + 'm';
     } else {
-      feasClass = 'feas-yes'; feasLabel = `LEAVE ${fmtTime(leaveAt)}`;
+      feasClass = 'feas-yes'; feasLabel = 'LEAVE ' + fmtTime(leaveAt);
     }
 
-    const data = {
-      idx: i,
-      dest: t.destNm || 'Loop',
-      trainArrMs: t.arrT.getTime()
-    };
-
-    return `
-    <div class="train-item" id="train-${i}" onclick='selectTrain(${JSON.stringify(data)})'>
-      <div class="train-top">
-        <div class="train-route">
-          <span class="line-badge">Brown</span>
-          <span class="train-dest">→ ${t.destNm || 'Loop'}</span>
-        </div>
-        <div style="text-align:right">
-          <div class="train-arr ${arrClass}">${minsDisplay}</div>
-          <div class="train-mins-label">${minsLabel}</div>
-        </div>
-      </div>
-      <div class="train-bottom">
-        <div class="train-depart">Depart home <span class="depart-highlight">${fmtTime(leaveAt)}</span></div>
-        <div class="feasibility ${feasClass}">${feasLabel}</div>
-      </div>
-    </div>`;
+    return '<div class="train-item" id="train-' + i + '" onclick="selectTrain(' + i + ')">' +
+      '<div class="train-top">' +
+        '<div class="train-route">' +
+          '<span class="line-badge">Brown</span>' +
+          '<span class="train-dest">&rarr; ' + (t.destNm || 'Loop') + '</span>' +
+        '</div>' +
+        '<div style="text-align:right">' +
+          '<div class="train-arr ' + arrClass + '">' + minsDisplay + '</div>' +
+          '<div class="train-mins-label">' + minsLabel + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="train-bottom">' +
+        '<div class="train-depart">Depart home <span class="depart-highlight">' + fmtTime(leaveAt) + '</span></div>' +
+        '<div class="feasibility ' + feasClass + '">' + feasLabel + '</div>' +
+      '</div>' +
+    '</div>';
   }).join('');
 }
 
-function selectTrain(info) {
-  document.querySelectorAll('.train-item').forEach(el => el.classList.remove('selected'));
-  document.getElementById(`train-${info.idx}`)?.classList.add('selected');
-  selectedTrain = info.idx;
+function selectTrain(idx) {
+  if (!lastItems || !lastItems[idx]) return;
+  const t = lastItems[idx];
 
-  const trainArr = new Date(info.trainArrMs);
+  document.querySelectorAll('.train-item').forEach(function(el) { el.classList.remove('selected'); });
+  const el = document.getElementById('train-' + idx);
+  if (el) el.classList.add('selected');
+  selectedTrain = idx;
+
+  const trainArr = t.arrT;
   const now = new Date();
 
-  // Buffer baked in throughout
   const leaveAt = new Date(trainArr.getTime() - WALK_TO_STATION * 60000 - bufferMins * 60000);
   const arriveStation = new Date(leaveAt.getTime() + WALK_TO_STATION * 60000);
   const arriveQuincy = new Date(trainArr.getTime() + TRAIN_RIDE * 60000);
@@ -786,40 +748,40 @@ function selectTrain(info) {
   const leaveInMins = Math.round((leaveAt - now) / 60000);
   const totalMins = WALK_TO_STATION + bufferMins + TRAIN_RIDE + WALK_FROM_QUINCY;
 
-  const urgency = leaveInMins <= 0 ? '⚠️ Leave immediately!' :
-    leaveInMins <= 3 ? `⚡ Leave in ${leaveInMins} min` :
-    `Leave in ${leaveInMins} min`;
+  const urgency = leaveInMins <= 0 ? '&#9888;&#65039; Leave immediately!' :
+    leaveInMins <= 3 ? '&#9889; Leave in ' + leaveInMins + ' min' :
+    'Leave in ' + leaveInMins + ' min';
 
-  document.getElementById('summarySection').innerHTML = `
-  <div class="summary-card">
-    <div class="summary-title">Trip Plan · ${bufferMins}min early · → ${info.dest}</div>
-    <div class="summary-timeline">
-      <div class="summary-row">
-        <span class="summary-label">🏠 Leave home</span>
-        <span class="summary-value">${fmtTime(leaveAt)} &nbsp;<small style="color:var(--brown-light)">${urgency}</small></span>
-      </div>
-      <div class="summary-row">
-        <span class="summary-label">🚶 Walk · 10 min</span>
-        <span class="summary-value">arrive Francisco ${fmtTime(arriveStation)}</span>
-      </div>
-      <div class="summary-row">
-        <span class="summary-label">🚂 Board · ${fmtTime(trainArr)}</span>
-        <span class="summary-value">ride ~35 min</span>
-      </div>
-      <div class="summary-row">
-        <span class="summary-label">🚶 Walk · 5 min</span>
-        <span class="summary-value">arrive OCC ${fmtTime(arriveOCC)}</span>
-      </div>
-      <div class="summary-row" style="border-top: 1px solid var(--brown); margin-top:6px; padding-top:10px;">
-        <span class="summary-label" style="color:var(--brown-light)">🏢 At desk · ${bufferMins}min early</span>
-        <span class="summary-value arrival">${fmtTime(arriveOCC)}</span>
-      </div>
-      <div class="summary-row">
-        <span class="summary-label" style="color:var(--muted)">⏱ Total door-to-desk</span>
-        <span class="summary-value" style="color:var(--muted)">${totalMins} min</span>
-      </div>
-    </div>
-  </div>`;
+  document.getElementById('summarySection').innerHTML =
+  '<div class="summary-card">' +
+    '<div class="summary-title">Trip Plan &middot; ' + bufferMins + 'min buffer &middot; &rarr; ' + t.destNm + '</div>' +
+    '<div class="summary-timeline">' +
+      '<div class="summary-row">' +
+        '<span class="summary-label">&#127968; Leave home</span>' +
+        '<span class="summary-value">' + fmtTime(leaveAt) + ' &nbsp;<small style="color:var(--brown-light)">' + urgency + '</small></span>' +
+      '</div>' +
+      '<div class="summary-row">' +
+        '<span class="summary-label">&#128694; Walk &middot; ' + WALK_TO_STATION + ' min</span>' +
+        '<span class="summary-value">at Damen ' + fmtTime(arriveStation) + ' (' + bufferMins + 'm spare)</span>' +
+      '</div>' +
+      '<div class="summary-row">' +
+        '<span class="summary-label">&#128642; Board &middot; ' + fmtTime(trainArr) + '</span>' +
+        '<span class="summary-value">ride ~' + TRAIN_RIDE + ' min to Quincy</span>' +
+      '</div>' +
+      '<div class="summary-row">' +
+        '<span class="summary-label">&#128694; Walk &middot; ' + WALK_FROM_QUINCY + ' min</span>' +
+        '<span class="summary-value">arrive OCC ' + fmtTime(arriveOCC) + '</span>' +
+      '</div>' +
+      '<div class="summary-row" style="border-top: 1px solid var(--brown); margin-top:6px; padding-top:10px;">' +
+        '<span class="summary-label" style="color:var(--brown-light)">&#127970; At desk</span>' +
+        '<span class="summary-value arrival">' + fmtTime(arriveOCC) + '</span>' +
+      '</div>' +
+      '<div class="summary-row">' +
+        '<span class="summary-label" style="color:var(--muted)">&#9201; Total door-to-desk</span>' +
+        '<span class="summary-value" style="color:var(--muted)">' + totalMins + ' min</span>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
 }
 
 // Diagnostic tool
@@ -829,113 +791,74 @@ async function runDiag() {
   panel.style.display = 'block';
   panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   box.style.color = '#a8d8a8';
-  box.textContent = 'Testing CTA API...
-
-URL: https://lapi.transitchicago.com/api/1.0/ttarrivals.aspx
-Key: ' + API_KEY.substring(0,8) + '...
-Map ID: ' + FRANCISCO_MAP_ID + '
-
-Sending request...';
-
-  const ctaUrl = `https://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=${API_KEY}&mapid=${FRANCISCO_MAP_ID}&max=3&outputType=JSON`;
-  const url = `https://corsproxy.io/?url=${encodeURIComponent(ctaUrl)}`;
+  box.textContent = 'Testing CTA API...\n\n' +
+    'URL: https://lapi.transitchicago.com/api/1.0/ttarrivals.aspx\n' +
+    'Key: ' + API_KEY.substring(0, 8) + '...\n' +
+    'Stop ID: ' + STOP_ID + ' (Damen, Loop-bound)\n\n' +
+    'Sending request...';
 
   try {
     const start = Date.now();
-    const resp = await fetch(url);
+    const raw = await fetchViaProxies(ctaApiUrl(3));
     const elapsed = Date.now() - start;
 
-    let resultText = `HTTP Status: ${resp.status} ${resp.statusText}
-Response time: ${elapsed}ms
-
-`;
-
-    if (!resp.ok) {
-      box.style.color = '#f87171';
-      box.textContent = resultText + `ERROR: Server returned HTTP ${resp.status}
-Your API key may be invalid or not yet activated.`;
-      return;
-    }
-
-    const raw = await resp.text();
-    resultText += 'Raw response:
-' + raw;
+    let resultText = 'Response time: ' + elapsed + 'ms\n\nRaw response:\n' + raw + '\n\n';
 
     let data;
     try {
       data = JSON.parse(raw);
-    } catch(e) {
+    } catch (e) {
       box.style.color = '#f87171';
-      box.textContent = resultText + '
-
-ERROR: Response is not valid JSON.';
+      box.textContent = resultText + 'ERROR: Response is not valid JSON.';
       return;
     }
 
-    const root = data?.ctatt;
-    const errCd = root?.errCd?.[0] || root?.errCd;
-    const errNm = root?.errNm?.[0] || root?.errNm;
+    const root = data && data.ctatt;
+    const errCd = String((root && root.errCd && root.errCd[0]) || (root && root.errCd) || '0');
+    const errNm = (root && root.errNm && root.errNm[0]) || (root && root.errNm) || '';
 
-    if (errCd && errCd !== '0') {
+    if (errCd !== '0') {
       box.style.color = '#f5a623';
-      box.textContent = `❌ CTA API Error
-
-Error code: ${errCd}
-Error message: ${errNm}
-
-` +
-        (errNm?.toLowerCase().includes('key') || errNm?.toLowerCase().includes('auth')
-          ? 'Your API key is not activated yet.
-Email: webmaster@transitchicago.com
-Ask them to activate key: ' + API_KEY
+      const keyIssue = errNm && (errNm.toLowerCase().indexOf('key') >= 0 || errNm.toLowerCase().indexOf('auth') >= 0);
+      box.textContent = 'CTA API Error\n\n' +
+        'Error code: ' + errCd + '\n' +
+        'Error message: ' + errNm + '\n\n' +
+        (keyIssue
+          ? 'Your API key is not activated or is invalid.\nEmail: webmaster@transitchicago.com\nAsk them to check key: ' + API_KEY
           : 'Check the error message above.') +
-        `
-
-Full response:
-${JSON.stringify(data, null, 2)}`;
+        '\n\nFull response:\n' + JSON.stringify(data, null, 2);
       return;
     }
 
-    const etas = root?.eta;
+    const etas = root && root.eta;
     if (!etas || (Array.isArray(etas) && etas.length === 0)) {
       box.style.color = '#f5a623';
-      box.textContent = `⚠️ API connected but no trains returned.
-
-This is normal late at night when service ends.
-Try again during service hours (approx 4am–1am).
-
-Full response:
-${JSON.stringify(data, null, 2)}`;
+      box.textContent = 'API connected but no trains returned.\n\n' +
+        'This is normal late at night when service ends.\n' +
+        'Try again during service hours (approx 4am-1am).\n\n' +
+        'Full response:\n' + JSON.stringify(data, null, 2);
       return;
     }
 
     const etaArr = Array.isArray(etas) ? etas : [etas];
     box.style.color = '#4ade80';
-    box.textContent = `✅ API is working!
+    box.textContent = 'API is working!\n\n' +
+      'Found ' + etaArr.length + ' upcoming train(s) at Damen (Loop-bound).\n\n' +
+      'Next trains:\n' +
+      etaArr.slice(0, 3).map(function(e) {
+        return '  - ' + e.rt + ' -> ' + e.destNm + ' arriving ' + e.arrT;
+      }).join('\n') +
+      '\n\nResponse time: ' + elapsed + 'ms\n\n' +
+      'If the main list still shows demo mode, hit Refresh.';
 
-Found ${etaArr.length} upcoming train(s) at Francisco.
-
-Next trains:
-` +
-      etaArr.slice(0,3).map(e => `  · ${e.rt} → ${e.destNm} arriving ${e.arrT}`).join('
-') +
-      `
-
-Response time: ${elapsed}ms
-
-If you still see demo mode in the main list,
-try hitting ↻ Refresh.`;
-
-  } catch(err) {
+  } catch (err) {
     box.style.color = '#f87171';
-    box.textContent = `❌ Network error — could not reach CTA servers.
-
-Error: ${err.message}
-
-Possible causes:
-  · No internet connection
-  · CTA servers are down
-  · CORS blocked (only happens if not on GitHub Pages)`;
+    box.textContent = 'Network error - could not reach CTA servers.\n\n' +
+      'Error: ' + err.message + '\n\n' +
+      'Possible causes:\n' +
+      '  - No internet connection\n' +
+      '  - CTA servers are down\n' +
+      '  - Both CORS proxies are blocked or rate-limited';
   }
 }
 
@@ -949,6 +872,5 @@ setInterval(updateClock, 1000);
 fetchTrains();
 setInterval(fetchTrains, 60000);
 </script>
-
 </body>
 </html>
